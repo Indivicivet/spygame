@@ -579,10 +579,12 @@ function renderPlayerGrid() {
         
         let arrowHtml = '';
         if (!p.eliminated && index === state.turnFocusIndex && state.phase === 'game') {
+            const dirClass = state.playDirection === 1 ? 'dir-right' : 'dir-left';
+            const arrowChar = state.playDirection === 1 ? '→' : '←';
             arrowHtml = `
-            <div class="turn-indicator">
+            <div class="turn-indicator ${dirClass}">
                 <div class="turn-indicator-text">ROUND</div>
-                <div class="turn-arrow">${state.playDirection === 1 ? '→' : '←'}</div>
+                <div class="turn-arrow">${arrowChar}</div>
                 <div class="turn-indicator-text">START</div>
             </div>`;
         }
