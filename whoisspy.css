@@ -496,7 +496,7 @@ video {
   align-items: center;
   cursor: pointer;
   transition: transform 0.2s, background 0.2s;
-  overflow: hidden;
+  /* overflow explicit removed to let arrows hang outside */
 }
 
 .player-item:hover {
@@ -510,10 +510,19 @@ video {
   transform: translateY(-2px);
 }
 
+.player-item.bg-civ { background-color: rgba(59, 130, 246, 0.2); border-color: var(--civ-color); }
+.player-item.bg-spy { background-color: rgba(239, 68, 68, 0.2); border-color: var(--spy-color); }
+.player-item.bg-blk { background-color: rgba(148, 163, 184, 0.2); border-color: var(--blk-color); }
+
+.player-item.striped-dead {
+  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.4) 0, rgba(0,0,0,0.4) 15px, transparent 15px, transparent 30px);
+  opacity: 0.8 !important;
+}
+
 .turn-arrow {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
   background-color: var(--accent-color);
   color: white;
   width: 28px;
@@ -526,12 +535,26 @@ video {
   font-size: 1.1rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   z-index: 10;
-  animation: bounceArrow 1.5s infinite;
 }
 
-@keyframes bounceArrow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+.turn-arrow.dir-right {
+  right: -14px;
+  animation: bounceRight 1.5s infinite;
+}
+
+.turn-arrow.dir-left {
+  left: -14px;
+  animation: bounceLeft 1.5s infinite;
+}
+
+@keyframes bounceRight {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(4px); }
+}
+
+@keyframes bounceLeft {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(-4px); }
 }
 
 .player-item.eliminated {
@@ -558,16 +581,14 @@ video {
   border-color: var(--danger-color);
 }
 .player-item.eliminated .player-img-wrapper::after {
-  content: '✕';
+  content: '💀';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
-  color: var(--danger-color);
+  font-size: 44px;
   background: rgba(0,0,0,0.5);
-  font-weight: bold;
 }
 
 .player-number {

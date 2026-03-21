@@ -45,6 +45,7 @@ const state = {
     playDirection: 1, // 1 (forward), -1 (backward)
     turnFocusIndex: 0, // indicates whose turn started
     selectedPlayerIndex: null,
+    isRestarting: false,
     stream: null
 };
 
@@ -69,6 +70,10 @@ const DOM = {
         valTotal: document.getElementById('val-total'),
         valSpy: document.getElementById('val-spy'),
         valBlank: document.getElementById('val-blank'),
+        configCounters: document.getElementById('config-counters'),
+        existingPlayersGroup: document.getElementById('existing-players-group'),
+        lblExisting: document.getElementById('lbl-existing-players'),
+        btnResetPlayers: document.getElementById('btn-reset-players'),
         toggleCustom: document.getElementById('toggle-custom-words'),
         customArea: document.getElementById('custom-word-inputs'),
         customCiv: document.getElementById('input-custom-civilian'),
@@ -248,6 +253,13 @@ function setupEventListeners() {
     });
 
     DOM.ui.btnStart.addEventListener('click', startGame);
+    
+    DOM.ui.btnResetPlayers.addEventListener('click', () => {
+        state.isRestarting = false;
+        state.players = [];
+        state.originalOrder = [];
+        updateHomeUI();
+    });
 
     // Setup Actions
     DOM.btnSelfie.addEventListener('click', () => {
@@ -333,7 +345,8 @@ function validateConfig() {
 
 // --- Game Logic ---
 function startGame() {
-    if (!validateConfig()) return;
+    if (!state.isRestarting && !validateConfig()) return;
+    
     state.config.source = DOM.ui.toggleCustom.checked ? 'custom' : 'random';
     
     if (state.config.source === 'custom') {
@@ -352,16 +365,26 @@ function startGame() {
         state.currentWords.spy = pair.spy;
     }
 
-    generateRoles();
-    state.phase = 'setup';
-    state.setupIndex = 0;
-    state.turnFocusIndex = 0;
-    state.playDirection = 1;
-    state.selectedPlayerIndex = null;
+    if (state.isRestarting) {
+        let baseOrder = JSON.parse(JSON.stringify(state.originalOrder));
+        baseOrder.reverse();
+        const last = baseOrder.pop();
+        baseOrder.unshift(last);
+        state.originalOrder = JSON.parse(JSON.stringify(baseOrder));
+        
+        doRestartWithNewRoles();
+    } else {
+        generateRoles();
+        state.phase = 'setup';
+        state.setupIndex = 0;
+        state.turnFocusIndex = 0;
+        state.playDirection = 1;
+        state.selectedPlayerIndex = null;
 
-    switchScreen('setup');
-    initCamera();
-    prepareSetupNextPlayer();
+        switchScreen('setup');
+        initCamera();
+        prepareSetupNextPlayer();
+    }
 }
 
 function generateRoles() {
@@ -457,6 +480,10 @@ function takeSelfie() {
         state.players[state.setupIndex].img = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="%23cbd5e1"><rect width="200" height="200" fill="%23475569"/><circle cx="100" cy="80" r="40"/><path d="M40 180 q 60 -100 120 0"/></svg>';
     }
 
+    // Persist to originalOrder so repeating games retain images
+    const originalRef = state.originalOrder.find(p => p.id === state.players[state.setupIndex].id);
+    if (originalRef) originalRef.img = state.players[state.setupIndex].img;
+
     DOM.preview.src = state.players[state.setupIndex].img;
     DOM.video.classList.add('hidden');
     DOM.preview.classList.remove('hidden');
@@ -545,13 +572,19 @@ function renderPlayerGrid() {
         
         let arrowHtml = '';
         if (!p.eliminated && index === state.turnFocusIndex && state.phase === 'game') {
-            arrowHtml = `<div class="turn-arrow">${state.playDirection === 1 ? '→' : '←'}</div>`;
+            if (state.playDirection === 1) {
+                arrowHtml = `<div class="turn-arrow dir-right">→</div>`;
+            } else {
+                arrowHtml = `<div class="turn-arrow dir-left">←</div>`;
+            }
         }
         
         // Show role label if eliminated OR if game has ended
         let roleHtml = '';
         if (p.eliminated || state.phase === 'end') {
             roleHtml = `<div class="player-role-label">${getLoc(p.role === 'civilian' ? 'roleCivilian' : (p.role === 'spy' ? 'roleSpy' : 'roleBlank'))}</div>`;
+            classes += (p.role === 'civilian') ? ' bg-civ' : (p.role === 'spy' ? ' bg-spy' : ' bg-blk');
+            if (p.eliminated) classes += ' striped-dead';
         }
         
         item.innerHTML = `
@@ -641,31 +674,22 @@ function showEndGame(winner) {
 }
 
 function restartWithSamePlayers() {
-    let baseOrder = JSON.parse(JSON.stringify(state.originalOrder));
-    baseOrder.reverse();
-    const last = baseOrder.pop();
-    baseOrder.unshift(last);
-    
-    state.originalOrder = JSON.parse(JSON.stringify(baseOrder));
-    
-    if (state.config.source === 'random') {
-        const wordList = WORDS_MAP[state.lang];
-        const pair = wordList[Math.floor(Math.random() * wordList.length)];
-        state.currentWords.civilian = pair.civilian;
-        state.currentWords.spy = pair.spy;
-        
-        doRestartWithNewRoles();
+    state.isRestarting = true;
+    state.phase = 'home';
+    switchScreen('home');
+    updateHomeUI();
+}
+
+function updateHomeUI() {
+    if (state.isRestarting) {
+        DOM.ui.configCounters.classList.add('hidden');
+        DOM.ui.existingPlayersGroup.classList.remove('hidden');
+        DOM.ui.lblExisting.innerText = "Using existing players (" + state.players.length + ")";
+        DOM.ui.vBar.parentElement.classList.add('hidden');
     } else {
-        let cWord = prompt("Next round custom " + getLoc('customCivilianWord'));
-        let sWord = prompt("Next round custom " + getLoc('customSpyWord'));
-        if (cWord && sWord) {
-            state.currentWords.civilian = cWord.trim();
-            state.currentWords.spy = sWord.trim();
-            doRestartWithNewRoles();
-        } else {
-            alert("Custom words cancelled. Going to home screen.");
-            resetToHome();
-        }
+        DOM.ui.configCounters.classList.remove('hidden');
+        DOM.ui.existingPlayersGroup.classList.add('hidden');
+        DOM.ui.vBar.parentElement.classList.remove('hidden');
     }
 }
 
@@ -737,10 +761,12 @@ function nextReSetupPlayer() {
 
 function resetToHome() {
     stopCamera();
+    state.isRestarting = false;
     state.phase = 'home';
     state.players = [];
     state.originalOrder = [];
     switchScreen('home');
+    updateHomeUI();
 }
 
 document.addEventListener('DOMContentLoaded', init);
