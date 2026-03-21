@@ -42,6 +42,7 @@ const state = {
     originalOrder: [], 
     
     setupIndex: 0,
+    globalPlayDirection: 1,
     playDirection: 1, // 1 (forward), -1 (backward)
     turnFocusIndex: 0, // indicates whose turn started
     selectedPlayerIndex: null,
@@ -373,11 +374,9 @@ function startGame() {
     DOM.endgameWordsReveal.classList.add('hidden');
 
     if (state.isRestarting) {
-        let baseOrder = JSON.parse(JSON.stringify(state.originalOrder));
-        baseOrder.reverse();
-        const last = baseOrder.pop();
-        baseOrder.unshift(last);
-        state.originalOrder = JSON.parse(JSON.stringify(baseOrder));
+        state.globalPlayDirection = (state.globalPlayDirection === 1) ? -1 : 1;
+        state.playDirection = state.globalPlayDirection;
+        state.turnFocusIndex = state.playDirection === 1 ? 0 : state.players.length - 1;
         
         doRestartWithNewRoles();
     } else {
@@ -386,6 +385,7 @@ function startGame() {
         state.setupIndex = 0;
         state.turnFocusIndex = 0;
         state.playDirection = 1;
+        state.globalPlayDirection = 1;
         state.selectedPlayerIndex = null;
 
         switchScreen('setup');
@@ -719,8 +719,6 @@ function doRestartWithNewRoles() {
         };
     });
     
-    state.playDirection = 1;
-    state.turnFocusIndex = 0;
     state.selectedPlayerIndex = null;
     state.phase = 'setup-bypass';
     state.setupIndex = 0;
