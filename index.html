@@ -149,32 +149,25 @@
         <h3 id="ingame-forgot-word-text" class="word-text highlight-text">Your word is: X</h3>
         <button id="btn-ingame-remember" class="primary-btn action-btn push-down">I remember</button>
       </div>
+      
+      <!-- Post-game Actions -->
+      <div id="postgame-actions" class="action-buttons vertical-buttons hidden" style="margin-top:20px;">
+        <button id="btn-restart-same" class="primary-btn">New Game (Same Players)</button>
+        <button id="btn-new-game" class="secondary-btn">New Game (Change Players)</button>
+      </div>
     </main>
 
-    <!-- Modal removed, identity reveal modal kept -->
-    <div id="identity-modal" class="modal hidden">
-      <div class="modal-content glass-panel popup identity-popup">
-        <h2 id="identity-revealed-text" class="highlight-text large-text">Player X was a Spy!</h2>
-        <button id="btn-identity-continue" class="primary-btn action-btn push-down">Continue</button>
+    <!-- End Game Modal -->
+    <div id="end-modal" class="modal hidden">
+      <div class="modal-content glass-panel popup end-card">
+        <h2 id="end-winner-text" class="winner-text pulse-glow">Civilians Win!</h2>
+        <div id="end-guess-area" style="margin-top: 16px; margin-bottom: 24px;">
+           <p id="end-guess-prompt" class="small-text"></p>
+           <h3 id="end-spy-word" class="highlight-text hidden"></h3>
+        </div>
+        <button id="btn-end-see-results" class="primary-btn action-btn">See Results</button>
       </div>
     </div>
-
-    <!-- End Game Screen -->
-    <main id="end-game-screen" class="screen hidden">
-      <div class="card glass-panel end-card">
-        <h1 id="end-winner-text" class="winner-text pulse-glow">Spies Win!</h1>
-        <p id="end-winning-word-text" class="small-text">The civilian word was: Bicycle. The spy word was: Motorbike.</p>
-        
-        <div id="end-players-list" class="end-players-list">
-          <!-- List of players and their roles inserted via JS -->
-        </div>
-        
-        <div class="action-buttons vertical-buttons">
-          <button id="btn-restart-same" class="primary-btn action-btn">Restart with same players</button>
-          <button id="btn-new-game" class="secondary-btn action-btn">New Game</button>
-        </div>
-      </div>
-    </main>
   </div>
   
   <script src="whoisspy.js"></script>
