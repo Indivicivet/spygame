@@ -12,9 +12,8 @@
   --secondary-color: #475569;
   --secondary-hover: #334155;
   --accent-color: #10b981;
-  --accent-color-hover: #059669;
-  --civ-color: #3b82f6;
-  --spy-color: #ef4444;
+  --civ-color: #ef4444;
+  --spy-color: #3b82f6;
   --blk-color: #94a3b8;
   --glass-blur: blur(12px);
   --font-family: 'Inter', sans-serif;
@@ -510,12 +509,12 @@ video {
   transform: translateY(-2px);
 }
 
-.player-item.bg-civ { background-color: rgba(59, 130, 246, 0.2); border-color: var(--civ-color); }
-.player-item.bg-spy { background-color: rgba(239, 68, 68, 0.2); border-color: var(--spy-color); }
-.player-item.bg-blk { background-color: rgba(148, 163, 184, 0.2); border-color: var(--blk-color); }
+.player-item.bg-civ { background-color: var(--civ-color); border-color: var(--civ-color); color: white; }
+.player-item.bg-spy { background-color: var(--spy-color); border-color: var(--spy-color); color: white; }
+.player-item.bg-blk { background-color: var(--blk-color); border-color: var(--blk-color); color: white; }
 
 .player-item.striped-dead {
-  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.4) 0, rgba(0,0,0,0.4) 15px, transparent 15px, transparent 30px);
+  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.5) 15px, transparent 15px, transparent 30px);
   opacity: 0.8 !important;
 }
 
@@ -539,22 +538,10 @@ video {
 
 .turn-arrow.dir-right {
   right: -14px;
-  animation: bounceRight 1.5s infinite;
 }
 
 .turn-arrow.dir-left {
   left: -14px;
-  animation: bounceLeft 1.5s infinite;
-}
-
-@keyframes bounceRight {
-  0%, 100% { transform: translateY(-50%) translateX(0); }
-  50% { transform: translateY(-50%) translateX(4px); }
-}
-
-@keyframes bounceLeft {
-  0%, 100% { transform: translateY(-50%) translateX(0); }
-  50% { transform: translateY(-50%) translateX(-4px); }
 }
 
 .player-item.eliminated {

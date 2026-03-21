@@ -103,6 +103,8 @@ const DOM = {
     btnIngameRemember: document.getElementById('btn-ingame-remember'),
     
     postgameActions: document.getElementById('postgame-actions'),
+    endgameWordsReveal: document.getElementById('endgame-words-reveal'),
+    endgameWordsText: document.getElementById('endgame-words-text'),
     
     // End Game Modal
     endModal: document.getElementById('end-modal'),
@@ -293,6 +295,8 @@ function setupEventListeners() {
         DOM.endModal.classList.add('hidden');
         state.phase = 'end';
         DOM.postgameActions.classList.remove('hidden');
+        DOM.endgameWordsReveal.classList.remove('hidden');
+        DOM.endgameWordsText.innerHTML = `${getLoc('roleCivilian')}: ${state.currentWords.civilian} <br> ${getLoc('roleSpy')}: ${state.currentWords.spy}`;
         renderPlayerGrid();
     });
 
@@ -364,6 +368,9 @@ function startGame() {
         state.currentWords.civilian = pair.civilian;
         state.currentWords.spy = pair.spy;
     }
+    
+    DOM.postgameActions.classList.add('hidden');
+    DOM.endgameWordsReveal.classList.add('hidden');
 
     if (state.isRestarting) {
         let baseOrder = JSON.parse(JSON.stringify(state.originalOrder));
