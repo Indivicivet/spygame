@@ -23,7 +23,7 @@ const state = {
     phase: 'home', // 'home', 'setup', 'game', 'end'
     
     config: {
-        total: 6,
+        total: 4,
         spies: 1,
         blanks: 0,
         source: 'random',
