@@ -29,27 +29,25 @@
         <h1 id="app-title">Who is Spy?</h1>
         <button id="btn-top-reset" class="secondary-btn hidden small-btn">Reset</button>
       </div>
-      <div class="lang-selector">
-        <span class="flag active" data-lang="en">🇬🇧</span>
-        <span class="flag" data-lang="zh-CN">🇨🇳</span>
-        <span class="flag" data-lang="zh-TW">🇹🇼</span>
-        <span class="flag" data-lang="ja">🇯🇵</span>
-      </div>
     </header>
 
     <!-- Home Screen: Setup -->
     <main id="home-screen" class="screen active">
       <div class="card glass-panel">
         
+        <div class="setting-group compact" style="justify-content: center; padding-top: 10px; margin-bottom: 24px;">
+          <div class="lang-selector">
+            <span class="flag active" data-lang="en">🇬🇧</span>
+            <span class="flag" data-lang="zh-CN">🇨🇳</span>
+            <span class="flag" data-lang="zh-TW">🇹🇼</span>
+            <span class="flag" data-lang="ja">🇯🇵</span>
+          </div>
+        </div>
+
         <!-- Visualization Bar -->
-        <div class="visualization-container">
+        <div class="visualization-container" style="margin-bottom: 16px;">
           <div id="role-visualization" class="role-bar">
             <!-- Dynamic styling applied via style attr or internal divs -->
-          </div>
-          <div class="role-legend">
-            <span class="legend-dot civilian-color"></span> <span id="leg-civ">Civilian</span>
-            <span class="legend-dot spy-color"></span> <span id="leg-spy">Spy</span>
-            <span class="legend-dot blank-color"></span> <span id="leg-blk">Blank</span>
           </div>
         </div>
 
@@ -80,8 +78,6 @@
             <button class="counter-btn" id="btn-plus-blank">+</button>
           </div>
         </div>
-        
-        <p id="player-count-warning" class="warning hidden">Invalid player configuration.</p>
         
         <!-- Custom Words Toggle -->
         <div class="setting-group toggle-group">

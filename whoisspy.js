@@ -71,10 +71,6 @@ const DOM = {
         valSpy: document.getElementById('val-spy'),
         valBlank: document.getElementById('val-blank'),
         toggleCustom: document.getElementById('toggle-custom-words'),
-        legCiv: document.getElementById('leg-civ'),
-        legSpy: document.getElementById('leg-spy'),
-        legBlk: document.getElementById('leg-blk'),
-        warning: document.getElementById('player-count-warning'),
         customArea: document.getElementById('custom-word-inputs'),
         customCiv: document.getElementById('input-custom-civilian'),
         customSpy: document.getElementById('input-custom-spy'),
@@ -131,24 +127,67 @@ function init() {
     applyLanguage(state.lang);
 }
 
+const maxSpiesBlanks = (total) => {
+    if (total <= 4) return 1;
+    if (total <= 8) return 2;
+    return 3;
+};
+
+const maxBlanks = (total) => {
+    if (total <= 4) return 0;
+    return 1;
+};
+
+function enforceConstraintsAfterTotalDrop() {
+    let t = state.config.total;
+    let allowedCombined = maxSpiesBlanks(t);
+    let allowedBlanks = maxBlanks(t);
+    
+    // Check blanks
+    if (state.config.blanks > allowedBlanks) {
+        state.config.blanks = allowedBlanks;
+    }
+    // Check combined
+    while (state.config.spies + state.config.blanks > allowedCombined) {
+        if (state.config.blanks > 0) {
+            state.config.blanks--;
+        } else {
+            state.config.spies--;
+            if (state.config.spies < 1) state.config.spies = 1;
+        }
+        if (state.config.spies === 1 && state.config.blanks === 0) break;
+    }
+    
+    DOM.ui.valTotal.innerText = state.config.total;
+    DOM.ui.valSpy.innerText = state.config.spies;
+    DOM.ui.valBlank.innerText = state.config.blanks;
+    updateVisualization();
+}
+
 function processCounterChange(type, delta) {
-    let changed = false;
     if (type === 'total') {
         let n = state.config.total + delta;
-        if (n >= 4 && n <= 10) { state.config.total = n; changed = true; }
+        if (n >= 4 && n <= 10) { 
+            state.config.total = n; 
+            enforceConstraintsAfterTotalDrop();
+        }
     } else if (type === 'spy') {
         let n = state.config.spies + delta;
-        if (n >= 1 && n <= 3) { state.config.spies = n; changed = true; }
+        let allowed = maxSpiesBlanks(state.config.total);
+        if (n >= 1 && n <= 3 && (n + state.config.blanks <= allowed)) { 
+            state.config.spies = n; 
+            DOM.ui.valSpy.innerText = state.config.spies;
+            updateVisualization();
+        }
     } else if (type === 'blank') {
         let n = state.config.blanks + delta;
-        if (n >= 0 && n <= 1) { state.config.blanks = n; changed = true; }
-    }
-    if (changed) {
-        DOM.ui.valTotal.innerText = state.config.total;
-        DOM.ui.valSpy.innerText = state.config.spies;
-        DOM.ui.valBlank.innerText = state.config.blanks;
-        validateConfig();
-        updateVisualization();
+        let allowedCombined = maxSpiesBlanks(state.config.total);
+        let allowedBlanks = maxBlanks(state.config.total);
+        if (n >= 0 && n <= allowedBlanks && (n + state.config.spies <= allowedCombined)) { 
+            state.config.blanks = n; 
+            DOM.ui.valBlank.innerText = state.config.blanks;
+            updateVisualization();
+        }
     }
 }
 
@@ -227,7 +266,7 @@ function setupEventListeners() {
     DOM.btnModalForgot.addEventListener('click', () => {
         DOM.modalActions.classList.add('hidden');
         DOM.modalRevealWord.classList.remove('hidden');
-        DOM.modalWordText.innerText = getPlayerWordRevealString(activePlayerContext.role);
+        DOM.modalWordText.innerHTML = getPlayerWordRevealString(activePlayerContext.role);
     });
 
     DOM.btnModalRemember.addEventListener('click', closeActionModal);
@@ -258,13 +297,9 @@ function applyLanguage(lang) {
     DOM.ui.lblSpy.innerText = loc.spyCount;
     DOM.ui.lblBlank.innerText = loc.blankCount;
     DOM.ui.lblToggle.innerText = loc.customWordsToggle;
-    DOM.ui.legCiv.innerText = loc.civilian;
-    DOM.ui.legSpy.innerText = loc.spy;
-    DOM.ui.legBlk.innerText = loc.blank;
     
     DOM.ui.customCiv.placeholder = loc.customCivilianWord;
     DOM.ui.customSpy.placeholder = loc.customSpyWord;
-    DOM.ui.warning.innerText = loc.playerCountWarning;
     DOM.ui.btnStart.innerText = loc.startGame;
     
     DOM.doNotShowOthers.innerText = loc.doNotShowOthers;
@@ -292,26 +327,7 @@ function updateGameHeaderStrings() {
 
 // --- Configuration & Validation ---
 function validateConfig() {
-    let t = state.config.total;
-    let s = state.config.spies;
-    let b = state.config.blanks;
-    
-    let valid = true;
-    if (t < 4 || t > 10) valid = false;
-    else if (t === 4 && (s > 1 || b > 0)) valid = false;
-    else if (t >= 5 && t <= 8 && (s + b > 2)) valid = false;
-    else if (t >= 9 && (s + b > 3)) valid = false;
-    else if (s < 1) valid = false;
-    else if (s + b >= t) valid = false; 
-    
-    if (!valid) {
-        DOM.ui.warning.classList.remove('hidden');
-        DOM.ui.btnStart.disabled = true;
-    } else {
-        DOM.ui.warning.classList.add('hidden');
-        DOM.ui.btnStart.disabled = false;
-    }
-    return valid;
+    return state.config.spies + state.config.blanks < state.config.total;
 }
 
 // --- Game Logic ---
@@ -422,9 +438,9 @@ function prepareSetupNextPlayer() {
 }
 
 function getPlayerWordRevealString(role) {
-    if (role === 'civilian') return getLoc('yourWordIs') + " " + state.currentWords.civilian;
-    if (role === 'spy') return getLoc('yourWordIs') + " " + state.currentWords.spy;
-    return getLoc('blankWordPrompt');
+    if (role === 'civilian') return state.currentWords.civilian;
+    if (role === 'spy') return state.currentWords.spy;
+    return `<span class="small-text">${getLoc('blankWordPrompt')}</span>`;
 }
 
 function takeSelfie() {
@@ -449,7 +465,7 @@ function takeSelfie() {
     DOM.wordRevealArea.classList.remove('hidden');
     DOM.btnRemember.classList.remove('hidden');
     
-    DOM.wordRevealText.innerText = getPlayerWordRevealString(state.players[state.setupIndex].role);
+    DOM.wordRevealText.innerHTML = getPlayerWordRevealString(state.players[state.setupIndex].role);
 }
 
 function nextSetupPlayer() {
@@ -654,7 +670,7 @@ function viewWordBypassSelfie() {
     DOM.wordRevealArea.classList.remove('hidden');
     DOM.btnRemember.classList.remove('hidden');
     
-    DOM.wordRevealText.innerText = getPlayerWordRevealString(state.players[state.setupIndex].role);
+    DOM.wordRevealText.innerHTML = getPlayerWordRevealString(state.players[state.setupIndex].role);
     
     DOM.btnRemember.onclick = nextReSetupPlayer;
 }
