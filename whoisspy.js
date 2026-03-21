@@ -579,11 +579,12 @@ function renderPlayerGrid() {
         
         let arrowHtml = '';
         if (!p.eliminated && index === state.turnFocusIndex && state.phase === 'game') {
-            if (state.playDirection === 1) {
-                arrowHtml = `<div class="turn-arrow dir-right">→</div>`;
-            } else {
-                arrowHtml = `<div class="turn-arrow dir-left">←</div>`;
-            }
+            arrowHtml = `
+            <div class="turn-indicator">
+                <div class="turn-indicator-text">ROUND</div>
+                <div class="turn-arrow">${state.playDirection === 1 ? '→' : '←'}</div>
+                <div class="turn-indicator-text">START</div>
+            </div>`;
         }
         
         // Show role label if eliminated OR if game has ended
@@ -633,7 +634,18 @@ function executePlayer() {
     
     state.selectedPlayerIndex = null;
     state.playDirection *= -1;
-    state.turnFocusIndex = idx; 
+    
+    let nextIdx = idx;
+    let found = false;
+    for (let i = 0; i < state.players.length; i++) {
+        nextIdx = (nextIdx + state.playDirection + state.players.length) % state.players.length;
+        if (!state.players[nextIdx].eliminated) {
+            state.turnFocusIndex = nextIdx;
+            found = true;
+            break;
+        }
+    }
+    if (!found) state.turnFocusIndex = idx;
     
     checkWinCondition();
 }

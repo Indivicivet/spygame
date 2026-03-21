@@ -518,14 +518,32 @@ video {
   opacity: 0.8 !important;
 }
 
-.turn-arrow {
+.turn-indicator {
   position: absolute;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+}
+
+.turn-indicator-text {
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  margin: 3px 0;
+}
+
+.turn-arrow {
   background-color: var(--accent-color);
   color: white;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -533,15 +551,6 @@ video {
   font-weight: bold;
   font-size: 1.1rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  z-index: 10;
-}
-
-.turn-arrow.dir-right {
-  right: -14px;
-}
-
-.turn-arrow.dir-left {
-  left: -14px;
 }
 
 .player-item.eliminated {
