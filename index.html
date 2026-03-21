@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Who is Spy?</title>
+  <link rel="stylesheet" href="whoisspy.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <script src="words_en.js"></script>
+  <script src="words_zh-CN.js"></script>
+  <script src="words_zh-TW.js"></script>
+  <script src="words_ja.js"></script>
+  <script src="localization.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Top Bar: Logo/Title and Language Selector -->
+    <header>
+      <h1 id="app-title">Who is Spy?</h1>
+      <div class="lang-selector">
+        <span class="flag active" data-lang="en">🇬🇧</span>
+        <span class="flag" data-lang="zh-CN">🇨🇳</span>
+        <span class="flag" data-lang="zh-TW">🇹🇼</span>
+        <span class="flag" data-lang="ja">🇯🇵</span>
+      </div>
+    </header>
+
+    <!-- Home Screen: Setup -->
+    <main id="home-screen" class="screen active">
+      <div class="card glass-panel">
+        <div class="setting-group">
+          <label id="lbl-total-players">Total Players:</label>
+          <input type="number" id="input-total-players" value="6" min="4" max="10">
+        </div>
+        <div class="setting-group">
+          <label id="lbl-spy-count">Spies:</label>
+          <input type="number" id="input-spy-count" value="1" min="1" max="3">
+        </div>
+        <div class="setting-group">
+          <label id="lbl-blank-count">Blank Cards:</label>
+          <input type="number" id="input-blank-count" value="0" min="0" max="1">
+        </div>
+        <p id="player-count-warning" class="warning hidden">Invalid player configuration.</p>
+        
+        <div class="setting-group">
+          <label id="lbl-word-source">Word Source:</label>
+          <select id="select-word-source">
+            <option value="random" id="opt-random-words">Random Words</option>
+            <option value="custom" id="opt-custom-words">Custom Words</option>
+          </select>
+        </div>
+
+        <div id="custom-word-inputs" class="hidden">
+          <p id="custom-words-prompt" class="small-text">Hand the phone to a non-player to enter the words.</p>
+          <input type="text" id="input-custom-civilian" placeholder="Civilian Word">
+          <input type="text" id="input-custom-spy" placeholder="Spy Word">
+        </div>
+
+        <button id="btn-start-game" class="primary-btn action-btn pulse-glow">Start Game</button>
+      </div>
+    </main>
+
+    <!-- Selfie / Word Assignment Screen -->
+    <main id="setup-action-screen" class="screen hidden">
+      <div class="card center-content glass-panel">
+        <h2 id="setup-player-title" class="player-title">Hand to Player 1</h2>
+        
+        <div class="camera-wrapper">
+          <div id="camera-container" class="camera-container circle-frame">
+            <video id="camera-view" autoplay playsinline></video>
+            <canvas id="camera-canvas" class="hidden"></canvas>
+            <img id="selfie-preview" class="hidden" alt="Selfie Preview">
+          </div>
+          <div class="camera-loader hidden" id="camera-loader"></div>
+        </div>
+        
+        <p id="photo-taken-prompt" class="hidden small-text prompt-text">Photo taken. Now revealing your word. Do not show others.</p>
+        
+        <div id="word-reveal-area" class="hidden word-area">
+          <h3 id="word-reveal-text" class="word-text highlight-text">Your word is: Apple</h3>
+        </div>
+        
+        <div class="action-buttons">
+          <button id="btn-take-selfie" class="primary-btn action-btn">I'm Player 1, take selfie</button>
+          <button id="btn-i-remember" class="primary-btn action-btn hidden">I remember</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Main Game Context -->
+    <main id="main-game-screen" class="screen hidden">
+      <div class="game-header card glass-panel">
+        <h2 id="lbl-players-remaining">Players Remaining: 6</h2>
+        <h3 id="lbl-play-direction" class="direction-text">Play Direction: Forward &rarr;</h3>
+        <p id="lbl-game-phase" class="phase-label">Discussion & Voting Phase</p>
+      </div>
+      
+      <div id="player-grid" class="player-grid">
+        <!-- Player items inserted via JS -->
+      </div>
+    </main>
+
+    <!-- Action Modal for Forgot Word / Execution -->
+    <div id="action-modal" class="modal hidden">
+      <div class="modal-content glass-panel popup">
+        <h2 id="modal-player-name">Player X</h2>
+        <div class="camera-container circle-frame modal-img-frame">
+          <img id="modal-player-img" src="" alt="Player image">
+        </div>
+        
+        <div id="modal-actions" class="modal-buttons">
+          <button id="btn-modal-forgot" class="secondary-btn">I forgot my word</button>
+          <button id="btn-modal-execute" class="danger-btn">Execute</button>
+          <button id="btn-modal-cancel" class="cancel-btn">Cancel</button>
+        </div>
+        
+        <div id="modal-reveal-word" class="hidden word-area">
+          <h3 id="modal-forgot-word-text" class="word-text highlight-text">Your word is: X</h3>
+          <button id="btn-modal-remember" class="primary-btn action-btn push-down">I remember</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Identity Reveal Modal -->
+    <div id="identity-modal" class="modal hidden">
+      <div class="modal-content glass-panel popup identity-popup">
+        <h2 id="identity-revealed-text" class="highlight-text large-text">Player X was a Spy!</h2>
+        <button id="btn-identity-continue" class="primary-btn action-btn push-down">Continue</button>
+      </div>
+    </div>
+
+    <!-- End Game Screen -->
+    <main id="end-game-screen" class="screen hidden">
+      <div class="card glass-panel end-card">
+        <h1 id="end-winner-text" class="winner-text pulse-glow">Spies Win!</h1>
+        <p id="end-winning-word-text" class="small-text">The civilian word was: Bicycle. The spy word was: Motorbike.</p>
+        
+        <div id="end-players-list" class="end-players-list">
+          <!-- List of players and their roles inserted via JS -->
+        </div>
+        
+        <div class="action-buttons vertical-buttons">
+          <button id="btn-restart-same" class="primary-btn action-btn">Restart with same players</button>
+          <button id="btn-new-game" class="secondary-btn action-btn">New Game</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script src="whoisspy.js"></script>
+</body>
+</html>
