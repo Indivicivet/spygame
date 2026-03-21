@@ -42,9 +42,9 @@ const state = {
     originalOrder: [], 
     
     setupIndex: 0,
-    
     playDirection: 1, // 1 (forward), -1 (backward)
-    
+    turnFocusIndex: 0, // indicates whose turn started
+    selectedPlayerIndex: null,
     stream: null
 };
 
@@ -53,8 +53,7 @@ const DOM = {
     screens: {
         home: document.getElementById('home-screen'),
         setup: document.getElementById('setup-action-screen'),
-        game: document.getElementById('main-game-screen'),
-        end: document.getElementById('end-game-screen')
+        game: document.getElementById('main-game-screen')
     },
     flags: document.querySelectorAll('.flag'),
     appTitle: document.getElementById('app-title'),
@@ -89,31 +88,25 @@ const DOM = {
     doNotShowOthers: document.getElementById('do-not-show-others'),
     
     // Main Game Screen
-    lblRemain: document.getElementById('lbl-players-remaining'),
-    lblDirection: document.getElementById('lbl-play-direction'),
-    lblGamePhase: document.getElementById('lbl-game-phase'),
+    ingameVBar: document.getElementById('ingame-role-visualization'),
     playerGrid: document.getElementById('player-grid'),
+    ingameActions: document.getElementById('ingame-actions'),
+    btnIngameForgot: document.getElementById('btn-ingame-forgot'),
+    btnIngameExec: document.getElementById('btn-ingame-execute'),
+    ingameRevealOverlay: document.getElementById('ingame-reveal-overlay'),
+    ingameWordText: document.getElementById('ingame-forgot-word-text'),
+    btnIngameRemember: document.getElementById('btn-ingame-remember'),
     
-    // Modals
-    actionModal: document.getElementById('action-modal'),
-    modalName: document.getElementById('modal-player-name'),
-    modalImg: document.getElementById('modal-player-img'),
-    modalRevealWord: document.getElementById('modal-reveal-word'),
-    modalWordText: document.getElementById('modal-forgot-word-text'),
-    modalActions: document.getElementById('modal-actions'),
-    btnModalForgot: document.getElementById('btn-modal-forgot'),
-    btnModalExec: document.getElementById('btn-modal-execute'),
-    btnModalCancel: document.getElementById('btn-modal-cancel'),
-    btnModalRemember: document.getElementById('btn-modal-remember'),
+    postgameActions: document.getElementById('postgame-actions'),
     
-    identityModal: document.getElementById('identity-modal'),
-    identityText: document.getElementById('identity-revealed-text'),
-    btnIdentityContinue: document.getElementById('btn-identity-continue'),
-    
-    // End Game Screen
+    // End Game Modal
+    endModal: document.getElementById('end-modal'),
     winnerText: document.getElementById('end-winner-text'),
-    winningWordText: document.getElementById('end-winning-word-text'),
-    endPlayerList: document.getElementById('end-players-list'),
+    endGuessArea: document.getElementById('end-guess-area'),
+    endGuessPrompt: document.getElementById('end-guess-prompt'),
+    endSpyWord: document.getElementById('end-spy-word'),
+    btnEndSeeResults: document.getElementById('btn-end-see-results'),
+    
     btnRestartSame: document.getElementById('btn-restart-same'),
     btnNewGame: document.getElementById('btn-new-game')
 };
@@ -257,24 +250,38 @@ function setupEventListeners() {
     DOM.ui.btnStart.addEventListener('click', startGame);
 
     // Setup Actions
-    DOM.btnSelfie.addEventListener('click', takeSelfie);
-    DOM.btnRemember.addEventListener('click', nextSetupPlayer);
-
-    // Modal Actions
-    DOM.btnModalCancel.addEventListener('click', closeActionModal);
-    
-    DOM.btnModalForgot.addEventListener('click', () => {
-        DOM.modalActions.classList.add('hidden');
-        DOM.modalRevealWord.classList.remove('hidden');
-        DOM.modalWordText.innerHTML = getPlayerWordRevealString(activePlayerContext.role);
+    DOM.btnSelfie.addEventListener('click', () => {
+        if (state.phase === 'setup-bypass') viewWordBypassSelfie();
+        else takeSelfie();
+    });
+    DOM.btnRemember.addEventListener('click', () => {
+        if (state.phase === 'setup-bypass') nextReSetupPlayer();
+        else nextSetupPlayer();
     });
 
-    DOM.btnModalRemember.addEventListener('click', closeActionModal);
-    DOM.btnModalExec.addEventListener('click', executePlayer);
+    // Ingame Actions
+    DOM.btnIngameForgot.addEventListener('click', () => {
+        if (state.selectedPlayerIndex === null) return;
+        DOM.ingameActions.classList.add('hidden');
+        DOM.ingameRevealOverlay.classList.remove('hidden');
+        DOM.ingameWordText.innerHTML = getPlayerWordRevealString(state.players[state.selectedPlayerIndex].role);
+        DOM.playerGrid.classList.add('hidden'); // hide grid to prevent cheating
+    });
 
-    DOM.btnIdentityContinue.addEventListener('click', () => {
-        DOM.identityModal.classList.add('hidden');
-        checkWinCondition();
+    DOM.btnIngameRemember.addEventListener('click', () => {
+        DOM.ingameRevealOverlay.classList.add('hidden');
+        state.selectedPlayerIndex = null;
+        DOM.playerGrid.classList.remove('hidden');
+        renderPlayerGrid();
+    });
+
+    DOM.btnIngameExec.addEventListener('click', executePlayer);
+
+    DOM.btnEndSeeResults.addEventListener('click', () => {
+        DOM.endModal.classList.add('hidden');
+        state.phase = 'end';
+        DOM.postgameActions.classList.remove('hidden');
+        renderPlayerGrid();
     });
 
     // End Game Actions
@@ -305,11 +312,9 @@ function applyLanguage(lang) {
     DOM.doNotShowOthers.innerText = loc.doNotShowOthers;
     DOM.btnRemember.innerText = loc.iRemember;
     
-    DOM.lblGamePhase.innerText = loc.gamePhaseVoting;
-    DOM.btnModalForgot.innerText = loc.forgotWord;
-    DOM.btnModalExec.innerText = loc.execute;
-    DOM.btnModalCancel.innerText = loc.cancel;
-    DOM.btnModalRemember.innerText = loc.iRemember;
+    if (DOM.btnIngameForgot) DOM.btnIngameForgot.innerText = loc.forgotWord;
+    if (DOM.btnIngameExec) DOM.btnIngameExec.innerText = loc.execute;
+    if (DOM.btnIngameRemember) DOM.btnIngameRemember.innerText = loc.iRemember;
     
     DOM.btnRestartSame.innerText = loc.restartSamePlayers;
     DOM.btnNewGame.innerText = loc.newGame;
@@ -318,11 +323,7 @@ function applyLanguage(lang) {
 }
 
 function updateGameHeaderStrings() {
-    if (state.phase === 'game') {
-        DOM.lblRemain.innerText = getLoc('playersRemaining') + ": " + getRemainingCount();
-        const dirText = state.playDirection === 1 ? getLoc('directionForward') : getLoc('directionBackward');
-        DOM.lblDirection.innerText = getLoc('playDirection') + dirText;
-    }
+    // Replaced by visual bar
 }
 
 // --- Configuration & Validation ---
@@ -354,7 +355,9 @@ function startGame() {
     generateRoles();
     state.phase = 'setup';
     state.setupIndex = 0;
+    state.turnFocusIndex = 0;
     state.playDirection = 1;
+    state.selectedPlayerIndex = null;
 
     switchScreen('setup');
     initCamera();
@@ -421,6 +424,7 @@ function stopCamera() {
         state.stream.getTracks().forEach(track => track.stop());
         state.stream = null;
     }
+    DOM.video.srcObject = null;
 }
 
 function prepareSetupNextPlayer() {
@@ -481,64 +485,117 @@ function nextSetupPlayer() {
 // --- Main Game Flow ---
 function startMainGame() {
     state.phase = 'game';
+    state.selectedPlayerIndex = null;
     switchScreen('game');
     renderPlayerGrid();
-    updateGameHeaderStrings();
+    updateInGameVisualization();
 }
 
 function getRemainingCount() {
     return state.players.filter(p => !p.eliminated).length;
 }
 
+function updateInGameVisualization() {
+    DOM.ingameVBar.innerHTML = '';
+    const counts = { civ: 0, spy: 0, blk: 0, deadCiv: 0, deadSpy: 0, deadBlk: 0 };
+    
+    state.players.forEach(p => {
+        if (p.eliminated) {
+            if (p.role === 'civilian') counts.deadCiv++;
+            else if (p.role === 'spy') counts.deadSpy++;
+            else counts.deadBlk++;
+        } else {
+            if (p.role === 'civilian') counts.civ++;
+            else if (p.role === 'spy') counts.spy++;
+            else counts.blk++;
+        }
+    });
+
+    const total = state.players.length;
+    const segments = [
+        { c: 'rb-civ', w: (counts.civ/total)*100, dead: false },
+        { c: 'rb-civ rb-dead', w: (counts.deadCiv/total)*100, dead: true },
+        { c: 'rb-spy', w: (counts.spy/total)*100, dead: false },
+        { c: 'rb-spy rb-dead', w: (counts.deadSpy/total)*100, dead: true },
+        { c: 'rb-blk', w: (counts.blk/total)*100, dead: false },
+        { c: 'rb-blk rb-dead', w: (counts.deadBlk/total)*100, dead: true }
+    ];
+
+    segments.forEach(seg => {
+        if (seg.w > 0) {
+            let div = document.createElement('div');
+            div.className = seg.c;
+            div.style.width = seg.w + '%';
+            if (seg.dead) {
+                div.innerHTML = '💀';
+            }
+            DOM.ingameVBar.appendChild(div);
+        }
+    });
+}
+
 function renderPlayerGrid() {
     DOM.playerGrid.innerHTML = '';
     state.players.forEach((p, index) => {
+        let classes = 'player-item';
+        if (p.eliminated) classes += ' eliminated';
+        if (state.selectedPlayerIndex === index && state.phase === 'game') classes += ' selected';
         const item = document.createElement('div');
-        item.className = 'player-item' + (p.eliminated ? ' eliminated' : '');
+        item.className = classes;
+        
+        let arrowHtml = '';
+        if (!p.eliminated && index === state.turnFocusIndex && state.phase === 'game') {
+            arrowHtml = `<div class="turn-arrow">${state.playDirection === 1 ? '→' : '←'}</div>`;
+        }
+        
+        // Show role label if eliminated OR if game has ended
+        let roleHtml = '';
+        if (p.eliminated || state.phase === 'end') {
+            roleHtml = `<div class="player-role-label">${getLoc(p.role === 'civilian' ? 'roleCivilian' : (p.role === 'spy' ? 'roleSpy' : 'roleBlank'))}</div>`;
+        }
+        
         item.innerHTML = `
+            ${arrowHtml}
             <div class="player-img-wrapper">
                 <img src="${p.img}" alt="Player ${p.id}">
             </div>
             <div class="player-number">P${p.id}</div>
-            ${p.eliminated ? `<div class="player-role-label">${getLoc(p.role === 'civilian' ? 'roleCivilian' : (p.role === 'spy' ? 'roleSpy' : 'roleBlank'))}</div>` : ''}
+            ${roleHtml}
         `;
-        if (!p.eliminated) {
-            item.addEventListener('click', () => openActionModal(p, index));
+        if (!p.eliminated && state.phase === 'game') {
+            item.addEventListener('click', () => togglePlayerSelection(index));
         }
         DOM.playerGrid.appendChild(item);
     });
+    
+    if (state.selectedPlayerIndex !== null && state.phase === 'game') {
+        DOM.ingameActions.classList.remove('hidden');
+    } else {
+        DOM.ingameActions.classList.add('hidden');
+    }
 }
 
 // --- Player Actions ---
-function openActionModal(player, index) {
-    activePlayerContext = { ...player, index };
-    DOM.modalName.innerText = `Player ${player.id}`;
-    DOM.modalImg.src = player.img;
-    DOM.modalActions.classList.remove('hidden');
-    DOM.modalRevealWord.classList.add('hidden');
-    DOM.actionModal.classList.remove('hidden');
-}
-
-function closeActionModal() {
-    DOM.actionModal.classList.add('hidden');
-    activePlayerContext = null;
+function togglePlayerSelection(index) {
+    if (state.selectedPlayerIndex === index) {
+        state.selectedPlayerIndex = null;
+    } else {
+        state.selectedPlayerIndex = index;
+    }
+    renderPlayerGrid();
 }
 
 function executePlayer() {
-    const idx = activePlayerContext.index;
+    if (state.selectedPlayerIndex === null) return;
+    const idx = state.selectedPlayerIndex;
     state.players[idx].eliminated = true;
     const player = state.players[idx];
     
-    closeActionModal();
-    
+    state.selectedPlayerIndex = null;
     state.playDirection *= -1;
+    state.turnFocusIndex = idx; 
     
-    let roleLocStr = getLoc(player.role === 'civilian' ? 'roleCivilian' : (player.role === 'spy' ? 'roleSpy' : 'roleBlank'));
-    let identityMsg = getLoc('identityRevealed').replace('{player}', `Player ${player.id}`).replace('{role}', roleLocStr);
-    
-    DOM.identityText.innerText = identityMsg;
-    DOM.identityText.style.color = (player.role === 'spy' || player.role === 'blank') ? 'var(--danger-color)' : 'var(--accent-color)';
-    DOM.identityModal.classList.remove('hidden');
+    checkWinCondition();
 }
 
 function checkWinCondition() {
@@ -557,35 +614,30 @@ function checkWinCondition() {
     if (winner) {
         showEndGame(winner);
     } else {
+        updateInGameVisualization();
         renderPlayerGrid();
-        updateGameHeaderStrings();
     }
 }
 
 function showEndGame(winner) {
-    state.phase = 'end';
-    switchScreen('end');
+    DOM.endModal.classList.remove('hidden');
+    DOM.postgameActions.classList.add('hidden');
     
     DOM.winnerText.innerText = winner === 'Spies' ? getLoc('spiesWin') : getLoc('civiliansWin');
     DOM.winnerText.style.background = winner === 'Spies' ? 'linear-gradient(90deg, #ef4444, #f59e0b)' : 'linear-gradient(90deg, #10b981, #3b82f6)';
     DOM.winnerText.style.webkitBackgroundClip = 'text';
     
-    let winningWordStr = getLoc('winningWordWas')
-        .replace('{civilian}', state.currentWords.civilian)
-        .replace('{spy}', state.currentWords.spy);
-    DOM.winningWordText.innerText = winningWordStr;
+    if (winner === 'Civilians') {
+        DOM.endGuessPrompt.innerText = "The spies failed. Spies, can you guess what the civilian's word was?";
+        DOM.endSpyWord.classList.remove('hidden');
+        DOM.endSpyWord.innerText = "Spy word: " + state.currentWords.spy;
+    } else {
+        DOM.endGuessPrompt.innerText = "The spies won! Spies, did you successfully deduce the civilian word?";
+        DOM.endSpyWord.classList.add('hidden');
+    }
     
-    DOM.endPlayerList.innerHTML = '';
-    state.players.forEach(p => {
-        let roleLocStr = getLoc(p.role === 'civilian' ? 'roleCivilian' : (p.role === 'spy' ? 'roleSpy' : 'roleBlank'));
-        const row = document.createElement('div');
-        row.className = 'end-player-row';
-        row.innerHTML = `
-            <span>Player ${p.id}</span>
-            <span style="color: ${p.role === 'spy' ? 'var(--danger-color)' : 'inherit'}">${roleLocStr}</span>
-        `;
-        DOM.endPlayerList.appendChild(row);
-    });
+    renderPlayerGrid();
+    updateInGameVisualization();
 }
 
 function restartWithSamePlayers() {
@@ -637,9 +689,12 @@ function doRestartWithNewRoles() {
     });
     
     state.playDirection = 1;
-    state.phase = 'setup';
+    state.turnFocusIndex = 0;
+    state.selectedPlayerIndex = null;
+    state.phase = 'setup-bypass';
     state.setupIndex = 0;
     
+    DOM.postgameActions.classList.add('hidden');
     switchScreen('setup');
     prepareReSetupNextPlayer();
 }
@@ -647,7 +702,7 @@ function doRestartWithNewRoles() {
 function prepareReSetupNextPlayer() {
     const p = state.players[state.setupIndex];
     DOM.setupTitle.innerText = getLoc('handToPlayerN').replace('{n}', p.id);
-    DOM.btnSelfie.innerText = getLoc('playerReady').replace('{n}', p.id) + " (View Word)";
+    DOM.btnSelfie.innerText = "That's me!";
 
     DOM.setupTitle.classList.remove('hidden');
     DOM.video.classList.add('hidden');
@@ -658,8 +713,6 @@ function prepareReSetupNextPlayer() {
     DOM.doNotShowOthers.classList.add('hidden');
     DOM.btnSelfie.classList.remove('hidden');
     DOM.btnRemember.classList.add('hidden');
-    
-    DOM.btnSelfie.onclick = viewWordBypassSelfie;
 }
 
 function viewWordBypassSelfie() {
@@ -671,8 +724,6 @@ function viewWordBypassSelfie() {
     DOM.btnRemember.classList.remove('hidden');
     
     DOM.wordRevealText.innerHTML = getPlayerWordRevealString(state.players[state.setupIndex].role);
-    
-    DOM.btnRemember.onclick = nextReSetupPlayer;
 }
 
 function nextReSetupPlayer() {
@@ -680,8 +731,6 @@ function nextReSetupPlayer() {
     if (state.setupIndex < state.players.length) {
         prepareReSetupNextPlayer();
     } else {
-        DOM.btnSelfie.onclick = takeSelfie;
-        DOM.btnRemember.onclick = nextSetupPlayer;
         startMainGame();
     }
 }

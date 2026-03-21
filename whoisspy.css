@@ -116,6 +116,15 @@ header h1 {
 .rb-spy { background-color: var(--spy-color); transition: width 0.3s ease; }
 .rb-blk { background-color: var(--blk-color); transition: width 0.3s ease; }
 
+.rb-dead {
+  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.4) 0, rgba(0,0,0,0.4) 4px, transparent 4px, transparent 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  overflow: hidden;
+}
+
 .role-legend {
   display: flex;
   justify-content: center;
@@ -381,6 +390,14 @@ button:active {
   width: 100%;
 }
 
+.horizontal-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 20px;
+  width: 100%;
+}
+
 .push-down {
   margin-top: 16px;
 }
@@ -485,6 +502,36 @@ video {
 .player-item:hover {
   background: rgba(51, 65, 85, 0.8);
   transform: translateY(-2px);
+}
+
+.player-item.selected {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.turn-arrow {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: var(--accent-color);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  z-index: 10;
+  animation: bounceArrow 1.5s infinite;
+}
+
+@keyframes bounceArrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .player-item.eliminated {

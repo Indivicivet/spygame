@@ -125,39 +125,33 @@
 
     <!-- Main Game Context -->
     <main id="main-game-screen" class="screen hidden">
-      <div class="game-header card glass-panel">
-        <h2 id="lbl-players-remaining">Players Remaining: 6</h2>
-        <h3 id="lbl-play-direction" class="direction-text">Play Direction: Forward &rarr;</h3>
-        <p id="lbl-game-phase" class="phase-label">Discussion & Voting Phase</p>
+      <div class="game-header card glass-panel" style="padding: 16px; margin-bottom: 12px;">
+        <!-- In-game Visualization Bar -->
+        <div class="visualization-container" style="margin-bottom: 0;">
+          <div id="ingame-role-visualization" class="role-bar" style="margin-bottom: 0; min-height: 20px;">
+            <!-- Dynamic styling applied via script -->
+          </div>
+        </div>
       </div>
       
       <div id="player-grid" class="player-grid">
         <!-- Player items inserted via JS -->
       </div>
+      
+      <!-- In-game fixed Action Buttons -->
+      <div id="ingame-actions" class="action-buttons horizontal-buttons hidden">
+        <button id="btn-ingame-forgot" class="secondary-btn">I forgot my word</button>
+        <button id="btn-ingame-execute" class="danger-btn">Execute</button>
+      </div>
+
+      <!-- Quick reveal word overlay to replace modal functionality -->
+      <div id="ingame-reveal-overlay" class="hidden word-area text-center" style="margin-top: 20px;">
+        <h3 id="ingame-forgot-word-text" class="word-text highlight-text">Your word is: X</h3>
+        <button id="btn-ingame-remember" class="primary-btn action-btn push-down">I remember</button>
+      </div>
     </main>
 
-    <!-- Action Modal for Forgot Word / Execution -->
-    <div id="action-modal" class="modal hidden">
-      <div class="modal-content glass-panel popup">
-        <h2 id="modal-player-name">Player X</h2>
-        <div class="camera-container circle-frame modal-img-frame">
-          <img id="modal-player-img" src="" alt="Player image">
-        </div>
-        
-        <div id="modal-actions" class="modal-buttons">
-          <button id="btn-modal-forgot" class="secondary-btn">I forgot my word</button>
-          <button id="btn-modal-execute" class="danger-btn">Execute</button>
-          <button id="btn-modal-cancel" class="cancel-btn">Cancel</button>
-        </div>
-        
-        <div id="modal-reveal-word" class="hidden word-area">
-          <h3 id="modal-forgot-word-text" class="word-text highlight-text">Your word is: X</h3>
-          <button id="btn-modal-remember" class="primary-btn action-btn push-down">I remember</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Identity Reveal Modal -->
+    <!-- Modal removed, identity reveal modal kept -->
     <div id="identity-modal" class="modal hidden">
       <div class="modal-content glass-panel popup identity-popup">
         <h2 id="identity-revealed-text" class="highlight-text large-text">Player X was a Spy!</h2>
