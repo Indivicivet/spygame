@@ -10,6 +10,13 @@ const WORDS_MAP = {
     'ja': words_ja
 };
 
+const LOCALIZATION_MAP = {
+    'en': lang_en,
+    'zh-CN': lang_zh_CN,
+    'zh-TW': lang_zh_TW,
+    'ja': lang_ja
+};
+
 // Application State
 const state = {
     lang: 'en',
@@ -50,19 +57,29 @@ const DOM = {
         end: document.getElementById('end-game-screen')
     },
     flags: document.querySelectorAll('.flag'),
+    appTitle: document.getElementById('app-title'),
+    btnTopReset: document.getElementById('btn-top-reset'),
     
     // Home screen
-    inputs: {
-        total: document.getElementById('input-total-players'),
-        spies: document.getElementById('input-spy-count'),
-        blanks: document.getElementById('input-blank-count'),
-        source: document.getElementById('select-word-source'),
-        customCivilian: document.getElementById('input-custom-civilian'),
-        customSpy: document.getElementById('input-custom-spy')
+    ui: {
+        vBar: document.getElementById('role-visualization'),
+        lblTotal: document.getElementById('lbl-total-players'),
+        lblSpy: document.getElementById('lbl-spy-count'),
+        lblBlank: document.getElementById('lbl-blank-count'),
+        lblToggle: document.getElementById('lbl-custom-toggle'),
+        valTotal: document.getElementById('val-total'),
+        valSpy: document.getElementById('val-spy'),
+        valBlank: document.getElementById('val-blank'),
+        toggleCustom: document.getElementById('toggle-custom-words'),
+        legCiv: document.getElementById('leg-civ'),
+        legSpy: document.getElementById('leg-spy'),
+        legBlk: document.getElementById('leg-blk'),
+        warning: document.getElementById('player-count-warning'),
+        customArea: document.getElementById('custom-word-inputs'),
+        customCiv: document.getElementById('input-custom-civilian'),
+        customSpy: document.getElementById('input-custom-spy'),
+        btnStart: document.getElementById('btn-start-game')
     },
-    warning: document.getElementById('player-count-warning'),
-    customWordsArea: document.getElementById('custom-word-inputs'),
-    btnStart: document.getElementById('btn-start-game'),
     
     // Setup Screen
     setupTitle: document.getElementById('setup-player-title'),
@@ -73,11 +90,12 @@ const DOM = {
     btnRemember: document.getElementById('btn-i-remember'),
     wordRevealArea: document.getElementById('word-reveal-area'),
     wordRevealText: document.getElementById('word-reveal-text'),
-    photoPrompt: document.getElementById('photo-taken-prompt'),
+    doNotShowOthers: document.getElementById('do-not-show-others'),
     
     // Main Game Screen
     lblRemain: document.getElementById('lbl-players-remaining'),
     lblDirection: document.getElementById('lbl-play-direction'),
+    lblGamePhase: document.getElementById('lbl-game-phase'),
     playerGrid: document.getElementById('player-grid'),
     
     // Modals
@@ -109,21 +127,73 @@ let activePlayerContext = null;
 // Initialization
 function init() {
     setupEventListeners();
+    updateVisualization();
     applyLanguage(state.lang);
 }
 
+function processCounterChange(type, delta) {
+    let changed = false;
+    if (type === 'total') {
+        let n = state.config.total + delta;
+        if (n >= 4 && n <= 10) { state.config.total = n; changed = true; }
+    } else if (type === 'spy') {
+        let n = state.config.spies + delta;
+        if (n >= 1 && n <= 3) { state.config.spies = n; changed = true; }
+    } else if (type === 'blank') {
+        let n = state.config.blanks + delta;
+        if (n >= 0 && n <= 1) { state.config.blanks = n; changed = true; }
+    }
+    if (changed) {
+        DOM.ui.valTotal.innerText = state.config.total;
+        DOM.ui.valSpy.innerText = state.config.spies;
+        DOM.ui.valBlank.innerText = state.config.blanks;
+        validateConfig();
+        updateVisualization();
+    }
+}
+
+function updateVisualization() {
+    DOM.ui.vBar.innerHTML = '';
+    let total = state.config.total;
+    let spy = state.config.spies;
+    let blk = state.config.blanks;
+    let civ = total - spy - blk;
+    
+    if (civ < 0) civ = 0;
+    
+    let civPct = (civ / total) * 100;
+    let spyPct = (spy / total) * 100;
+    let blkPct = (blk / total) * 100;
+    
+    const colors = [
+        { c: 'rb-civ', w: civPct },
+        { c: 'rb-spy', w: spyPct },
+        { c: 'rb-blk', w: blkPct }
+    ];
+    
+    colors.forEach(col => {
+        if (col.w > 0) {
+            let div = document.createElement('div');
+            div.className = col.c;
+            div.style.width = col.w + '%';
+            DOM.ui.vBar.appendChild(div);
+        }
+    });
+}
+
 function setupEventListeners() {
+    // Top Reset button
+    DOM.btnTopReset.addEventListener('click', resetToHome);
+    
     // Language selection
     DOM.flags.forEach(flag => {
         flag.addEventListener('click', () => {
             const newLang = flag.dataset.lang;
             if (state.lang === newLang) return;
-            
             if (state.phase !== 'home') {
                 if (!confirm(getLoc('languageChangeWarning'))) return;
                 resetToHome();
             }
-            
             state.lang = newLang;
             DOM.flags.forEach(f => f.classList.remove('active'));
             flag.classList.add('active');
@@ -131,45 +201,36 @@ function setupEventListeners() {
         });
     });
 
-    // Home Inputs
-    DOM.inputs.source.addEventListener('change', (e) => {
-        if (e.target.value === 'custom') {
-            DOM.customWordsArea.classList.remove('hidden');
-        } else {
-            DOM.customWordsArea.classList.add('hidden');
-        }
+    // Counters
+    document.getElementById('btn-minus-total').addEventListener('click', () => processCounterChange('total', -1));
+    document.getElementById('btn-plus-total').addEventListener('click', () => processCounterChange('total', 1));
+    document.getElementById('btn-minus-spy').addEventListener('click', () => processCounterChange('spy', -1));
+    document.getElementById('btn-plus-spy').addEventListener('click', () => processCounterChange('spy', 1));
+    document.getElementById('btn-minus-blank').addEventListener('click', () => processCounterChange('blank', -1));
+    document.getElementById('btn-plus-blank').addEventListener('click', () => processCounterChange('blank', 1));
+
+    // Custom Words Toggle
+    DOM.ui.toggleCustom.addEventListener('change', (e) => {
+        if (e.target.checked) DOM.ui.customArea.classList.remove('hidden');
+        else DOM.ui.customArea.classList.add('hidden');
     });
 
-    DOM.inputs.total.addEventListener('change', validateConfig);
-    DOM.inputs.spies.addEventListener('change', validateConfig);
-    DOM.inputs.blanks.addEventListener('change', validateConfig);
-
-    DOM.btnStart.addEventListener('click', startGame);
+    DOM.ui.btnStart.addEventListener('click', startGame);
 
     // Setup Actions
     DOM.btnSelfie.addEventListener('click', takeSelfie);
     DOM.btnRemember.addEventListener('click', nextSetupPlayer);
 
     // Modal Actions
-    DOM.btnModalCancel.addEventListener('click', () => {
-        closeActionModal();
-    });
+    DOM.btnModalCancel.addEventListener('click', closeActionModal);
     
     DOM.btnModalForgot.addEventListener('click', () => {
         DOM.modalActions.classList.add('hidden');
         DOM.modalRevealWord.classList.remove('hidden');
-        let text = "";
-        if (activePlayerContext.role === 'civilian') text = state.currentWords.civilian;
-        else if (activePlayerContext.role === 'spy') text = getLoc('spyWordPrompt').replace('{word}', state.currentWords.spy);
-        else text = getLoc('blankWordPrompt');
-        
-        DOM.modalWordText.innerText = getLoc('yourWordIs') + " " + text;
+        DOM.modalWordText.innerText = getPlayerWordRevealString(activePlayerContext.role);
     });
 
-    DOM.btnModalRemember.addEventListener('click', () => {
-        closeActionModal();
-    });
-
+    DOM.btnModalRemember.addEventListener('click', closeActionModal);
     DOM.btnModalExec.addEventListener('click', executePlayer);
 
     DOM.btnIdentityContinue.addEventListener('click', () => {
@@ -184,31 +245,32 @@ function setupEventListeners() {
 
 // --- Localization ---
 function getLoc(key) {
-    return localization[state.lang][key] || key;
+    return LOCALIZATION_MAP[state.lang][key] || key;
 }
 
 function applyLanguage(lang) {
-    const loc = localization[lang];
+    const loc = LOCALIZATION_MAP[lang];
     document.title = loc.title;
-    document.getElementById('app-title').innerText = loc.title;
+    DOM.appTitle.innerText = loc.title;
+    DOM.btnTopReset.innerText = loc.resetGame;
     
-    document.getElementById('lbl-total-players').innerText = loc.totalPlayers;
-    document.getElementById('lbl-spy-count').innerText = loc.spyCount;
-    document.getElementById('lbl-blank-count').innerText = loc.blankCount;
-    document.getElementById('lbl-word-source').innerText = loc.wordSource;
-    document.getElementById('opt-random-words').innerText = loc.randomWords;
-    document.getElementById('opt-custom-words').innerText = loc.customWords;
-    document.getElementById('custom-words-prompt').innerText = loc.customWordsPrompt;
-    DOM.inputs.customCivilian.placeholder = loc.customCivilianWord;
-    DOM.inputs.customSpy.placeholder = loc.customSpyWord;
-    DOM.warning.innerText = loc.playerCountWarning;
-    DOM.btnStart.innerText = loc.startGame;
+    DOM.ui.lblTotal.innerText = loc.totalPlayers;
+    DOM.ui.lblSpy.innerText = loc.spyCount;
+    DOM.ui.lblBlank.innerText = loc.blankCount;
+    DOM.ui.lblToggle.innerText = loc.customWordsToggle;
+    DOM.ui.legCiv.innerText = loc.civilian;
+    DOM.ui.legSpy.innerText = loc.spy;
+    DOM.ui.legBlk.innerText = loc.blank;
     
-    document.getElementById('photo-taken-prompt').innerText = loc.photoTakenPrompt;
+    DOM.ui.customCiv.placeholder = loc.customCivilianWord;
+    DOM.ui.customSpy.placeholder = loc.customSpyWord;
+    DOM.ui.warning.innerText = loc.playerCountWarning;
+    DOM.ui.btnStart.innerText = loc.startGame;
+    
+    DOM.doNotShowOthers.innerText = loc.doNotShowOthers;
     DOM.btnRemember.innerText = loc.iRemember;
-    DOM.btnTakeSelfie = loc.playerReady; // updated dynamically
     
-    document.getElementById('lbl-game-phase').innerText = loc.gamePhaseVoting;
+    DOM.lblGamePhase.innerText = loc.gamePhaseVoting;
     DOM.btnModalForgot.innerText = loc.forgotWord;
     DOM.btnModalExec.innerText = loc.execute;
     DOM.btnModalCancel.innerText = loc.cancel;
@@ -230,9 +292,9 @@ function updateGameHeaderStrings() {
 
 // --- Configuration & Validation ---
 function validateConfig() {
-    let t = parseInt(DOM.inputs.total.value),
-        s = parseInt(DOM.inputs.spies.value),
-        b = parseInt(DOM.inputs.blanks.value);
+    let t = state.config.total;
+    let s = state.config.spies;
+    let b = state.config.blanks;
     
     let valid = true;
     if (t < 4 || t > 10) valid = false;
@@ -240,14 +302,14 @@ function validateConfig() {
     else if (t >= 5 && t <= 8 && (s + b > 2)) valid = false;
     else if (t >= 9 && (s + b > 3)) valid = false;
     else if (s < 1) valid = false;
+    else if (s + b >= t) valid = false; 
     
     if (!valid) {
-        DOM.warning.classList.remove('hidden');
-        DOM.btnStart.disabled = true;
+        DOM.ui.warning.classList.remove('hidden');
+        DOM.ui.btnStart.disabled = true;
     } else {
-        DOM.warning.classList.add('hidden');
-        DOM.btnStart.disabled = false;
-        state.config = { total: t, spies: s, blanks: b, source: DOM.inputs.source.value };
+        DOM.ui.warning.classList.add('hidden');
+        DOM.ui.btnStart.disabled = false;
     }
     return valid;
 }
@@ -255,11 +317,11 @@ function validateConfig() {
 // --- Game Logic ---
 function startGame() {
     if (!validateConfig()) return;
-    state.config.source = DOM.inputs.source.value;
+    state.config.source = DOM.ui.toggleCustom.checked ? 'custom' : 'random';
     
     if (state.config.source === 'custom') {
-        state.config.customCivilian = DOM.inputs.customCivilian.value.trim();
-        state.config.customSpy = DOM.inputs.customSpy.value.trim();
+        state.config.customCivilian = DOM.ui.customCiv.value.trim();
+        state.config.customSpy = DOM.ui.customSpy.value.trim();
         if (!state.config.customCivilian || !state.config.customSpy) {
             alert("Please enter custom words.");
             return;
@@ -274,7 +336,6 @@ function startGame() {
     }
 
     generateRoles();
-    
     state.phase = 'setup';
     state.setupIndex = 0;
     state.playDirection = 1;
@@ -290,19 +351,17 @@ function generateRoles() {
     for(let i=0; i<state.config.blanks; i++) roles.push('blank');
     while(roles.length < state.config.total) roles.push('civilian');
     
-    // shuffle
     roles.sort(() => Math.random() - 0.5);
     
     state.players = roles.map((r, idx) => ({
         id: idx + 1,
         role: r,
-        word: r === 'civilian' ? 'civilian' : (r === 'spy' ? 'spy' : 'blank'),
+        word: r === 'civilian' ? state.currentWords.civilian : (r === 'spy' ? state.currentWords.spy : 'blank'),
         img: null,
         eliminated: false,
-        initialPos: idx // retain global original order tracker
+        initialPos: idx 
     }));
     
-    // deep copy to original order
     state.originalOrder = JSON.parse(JSON.stringify(state.players));
 }
 
@@ -310,6 +369,15 @@ function generateRoles() {
 function switchScreen(screenName) {
     Object.values(DOM.screens).forEach(s => s.classList.add('hidden'));
     DOM.screens[screenName].classList.remove('hidden');
+    
+    // Header Logic
+    if (screenName === 'game' || screenName === 'end') {
+        DOM.appTitle.classList.add('hidden');
+        DOM.btnTopReset.classList.remove('hidden');
+    } else {
+        DOM.appTitle.classList.remove('hidden');
+        DOM.btnTopReset.classList.add('hidden');
+    }
 }
 
 // --- Camera & Setup Flow ---
@@ -317,20 +385,18 @@ async function initCamera() {
     DOM.video.classList.remove('hidden');
     DOM.preview.classList.add('hidden');
     DOM.wordRevealArea.classList.add('hidden');
-    DOM.photoPrompt.classList.add('hidden');
+    DOM.doNotShowOthers.classList.add('hidden');
     DOM.btnSelfie.classList.remove('hidden');
     DOM.btnRemember.classList.add('hidden');
+    DOM.setupTitle.classList.remove('hidden');
 
     try {
-        if (state.stream) {
-            state.stream.getTracks().forEach(track => track.stop());
-        }
+        if (state.stream) state.stream.getTracks().forEach(track => track.stop());
         state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
         DOM.video.srcObject = state.stream;
     } catch (err) {
         console.error("Camera access error:", err);
-        // fallback to placeholder if error
-        alert("Camera access denied or unavailable. Using fallback avatars.");
+        // Do not block UX if camera error, they'll get mocked avatars
     }
 }
 
@@ -346,23 +412,28 @@ function prepareSetupNextPlayer() {
     DOM.setupTitle.innerText = getLoc('handToPlayerN').replace('{n}', p.id);
     DOM.btnSelfie.innerText = getLoc('playerReady').replace('{n}', p.id);
 
+    DOM.setupTitle.classList.remove('hidden');
     DOM.video.classList.remove('hidden');
     DOM.preview.classList.add('hidden');
     DOM.wordRevealArea.classList.add('hidden');
-    DOM.photoPrompt.classList.add('hidden');
+    DOM.doNotShowOthers.classList.add('hidden');
     DOM.btnSelfie.classList.remove('hidden');
     DOM.btnRemember.classList.add('hidden');
 }
 
+function getPlayerWordRevealString(role) {
+    if (role === 'civilian') return getLoc('yourWordIs') + " " + state.currentWords.civilian;
+    if (role === 'spy') return getLoc('yourWordIs') + " " + state.currentWords.spy;
+    return getLoc('blankWordPrompt');
+}
+
 function takeSelfie() {
-    // Process selfie capturing
     if (state.stream) {
         DOM.canvas.width = DOM.video.videoWidth;
         DOM.canvas.height = DOM.video.videoHeight;
         DOM.canvas.getContext('2d').drawImage(DOM.video, 0, 0);
         state.players[state.setupIndex].img = DOM.canvas.toDataURL('image/jpeg', 0.8);
     } else {
-        // Mock image if camera failed
         state.players[state.setupIndex].img = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="%23cbd5e1"><rect width="200" height="200" fill="%23475569"/><circle cx="100" cy="80" r="40"/><path d="M40 180 q 60 -100 120 0"/></svg>';
     }
 
@@ -371,19 +442,14 @@ function takeSelfie() {
     DOM.preview.classList.remove('hidden');
 
     DOM.btnSelfie.classList.add('hidden');
-    DOM.photoPrompt.classList.remove('hidden');
+    DOM.setupTitle.classList.add('hidden'); // Remove Hand to Player X
+    DOM.doNotShowOthers.classList.remove('hidden');
     
     // Reveal word
     DOM.wordRevealArea.classList.remove('hidden');
     DOM.btnRemember.classList.remove('hidden');
     
-    const role = state.players[state.setupIndex].role;
-    let wordText = "";
-    if (role === 'civilian') wordText = state.currentWords.civilian;
-    else if (role === 'spy') wordText = getLoc('spyWordPrompt').replace('{word}', state.currentWords.spy);
-    else wordText = getLoc('blankWordPrompt');
-    
-    DOM.wordRevealText.innerText = getLoc('yourWordIs') + " " + wordText;
+    DOM.wordRevealText.innerText = getPlayerWordRevealString(state.players[state.setupIndex].role);
 }
 
 function nextSetupPlayer() {
@@ -449,15 +515,12 @@ function executePlayer() {
     
     closeActionModal();
     
-    // Toggle play direction based on elimination
     state.playDirection *= -1;
     
-    // Show Identity Reveal Modal
     let roleLocStr = getLoc(player.role === 'civilian' ? 'roleCivilian' : (player.role === 'spy' ? 'roleSpy' : 'roleBlank'));
     let identityMsg = getLoc('identityRevealed').replace('{player}', `Player ${player.id}`).replace('{role}', roleLocStr);
     
     DOM.identityText.innerText = identityMsg;
-    // Set color based on role
     DOM.identityText.style.color = (player.role === 'spy' || player.role === 'blank') ? 'var(--danger-color)' : 'var(--accent-color)';
     DOM.identityModal.classList.remove('hidden');
 }
@@ -496,7 +559,6 @@ function showEndGame(winner) {
         .replace('{spy}', state.currentWords.spy);
     DOM.winningWordText.innerText = winningWordStr;
     
-    // Populate end grid
     DOM.endPlayerList.innerHTML = '';
     state.players.forEach(p => {
         let roleLocStr = getLoc(p.role === 'civilian' ? 'roleCivilian' : (p.role === 'spy' ? 'roleSpy' : 'roleBlank'));
@@ -511,19 +573,13 @@ function showEndGame(winner) {
 }
 
 function restartWithSamePlayers() {
-    // Keep internal order state reverse and offset 1
-    // Example: Initially [1,2,3,4,5]
-    // Next game: reverse([1,2,3,4,5]) => [5,4,3,2,1] and offset +1 => [1,5,4,3,2]
-    
     let baseOrder = JSON.parse(JSON.stringify(state.originalOrder));
     baseOrder.reverse();
-    // Offset forwards by 1
     const last = baseOrder.pop();
     baseOrder.unshift(last);
     
     state.originalOrder = JSON.parse(JSON.stringify(baseOrder));
     
-    // Assign new words depending on custom/random
     if (state.config.source === 'random') {
         const wordList = WORDS_MAP[state.lang];
         const pair = wordList[Math.floor(Math.random() * wordList.length)];
@@ -532,7 +588,6 @@ function restartWithSamePlayers() {
         
         doRestartWithNewRoles();
     } else {
-        // Prompt for custom words via prompt() so we don't need a full redraw
         let cWord = prompt("Next round custom " + getLoc('customCivilianWord'));
         let sWord = prompt("Next round custom " + getLoc('customSpyWord'));
         if (cWord && sWord) {
@@ -552,25 +607,20 @@ function doRestartWithNewRoles() {
     for(let i=0; i<state.config.blanks; i++) roles.push('blank');
     while(roles.length < state.config.total) roles.push('civilian');
     
-    // shuffle
     roles.sort(() => Math.random() - 0.5);
     
-    // Reconstruct state.players using originalOrder and preserved selfies
     state.players = state.originalOrder.map((oldObj, index) => {
         return {
             id: oldObj.id,
             role: roles[index],
             word: roles[index] === 'civilian' ? 'civilian' : (roles[index] === 'spy' ? 'spy' : 'blank'),
-            img: oldObj.img, // keep selfie
+            img: oldObj.img,
             eliminated: false,
             initialPos: oldObj.initialPos
         };
     });
     
     state.playDirection = 1;
-    // We do NOT need to run setup since we have selfies.
-    // However, they need to see their new words!
-    // So we invoke setup phase again but WITHOUT camera.
     state.phase = 'setup';
     state.setupIndex = 0;
     
@@ -583,31 +633,28 @@ function prepareReSetupNextPlayer() {
     DOM.setupTitle.innerText = getLoc('handToPlayerN').replace('{n}', p.id);
     DOM.btnSelfie.innerText = getLoc('playerReady').replace('{n}', p.id) + " (View Word)";
 
+    DOM.setupTitle.classList.remove('hidden');
     DOM.video.classList.add('hidden');
     DOM.preview.src = p.img;
     DOM.preview.classList.remove('hidden');
     
     DOM.wordRevealArea.classList.add('hidden');
-    DOM.photoPrompt.classList.add('hidden');
+    DOM.doNotShowOthers.classList.add('hidden');
     DOM.btnSelfie.classList.remove('hidden');
     DOM.btnRemember.classList.add('hidden');
     
-    // Bind differently since no taking selfie
     DOM.btnSelfie.onclick = viewWordBypassSelfie;
 }
 
 function viewWordBypassSelfie() {
     DOM.btnSelfie.classList.add('hidden');
+    DOM.setupTitle.classList.add('hidden');
+    DOM.doNotShowOthers.classList.remove('hidden');
+    
     DOM.wordRevealArea.classList.remove('hidden');
     DOM.btnRemember.classList.remove('hidden');
     
-    const role = state.players[state.setupIndex].role;
-    let wordText = "";
-    if (role === 'civilian') wordText = state.currentWords.civilian;
-    else if (role === 'spy') wordText = getLoc('spyWordPrompt').replace('{word}', state.currentWords.spy);
-    else wordText = getLoc('blankWordPrompt');
-    
-    DOM.wordRevealText.innerText = getLoc('yourWordIs') + " " + wordText;
+    DOM.wordRevealText.innerText = getPlayerWordRevealString(state.players[state.setupIndex].role);
     
     DOM.btnRemember.onclick = nextReSetupPlayer;
 }
@@ -617,7 +664,6 @@ function nextReSetupPlayer() {
     if (state.setupIndex < state.players.length) {
         prepareReSetupNextPlayer();
     } else {
-        // Reset onclick to standard camera logic for new games
         DOM.btnSelfie.onclick = takeSelfie;
         DOM.btnRemember.onclick = nextSetupPlayer;
         startMainGame();
@@ -632,5 +678,4 @@ function resetToHome() {
     switchScreen('home');
 }
 
-// Kickoff
 document.addEventListener('DOMContentLoaded', init);

@@ -9,17 +9,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   
+  <!-- Word Data -->
   <script src="words_en.js"></script>
   <script src="words_zh-CN.js"></script>
   <script src="words_zh-TW.js"></script>
   <script src="words_ja.js"></script>
-  <script src="localization.js"></script>
+  
+  <!-- Localization Data -->
+  <script src="lang_en.js"></script>
+  <script src="lang_zh-CN.js"></script>
+  <script src="lang_zh-TW.js"></script>
+  <script src="lang_ja.js"></script>
 </head>
 <body>
   <div id="app">
     <!-- Top Bar: Logo/Title and Language Selector -->
-    <header>
-      <h1 id="app-title">Who is Spy?</h1>
+    <header id="main-header">
+      <div id="header-left">
+        <h1 id="app-title">Who is Spy?</h1>
+        <button id="btn-top-reset" class="secondary-btn hidden small-btn">Reset</button>
+      </div>
       <div class="lang-selector">
         <span class="flag active" data-lang="en">🇬🇧</span>
         <span class="flag" data-lang="zh-CN">🇨🇳</span>
@@ -31,30 +40,59 @@
     <!-- Home Screen: Setup -->
     <main id="home-screen" class="screen active">
       <div class="card glass-panel">
-        <div class="setting-group">
+        
+        <!-- Visualization Bar -->
+        <div class="visualization-container">
+          <div id="role-visualization" class="role-bar">
+            <!-- Dynamic styling applied via style attr or internal divs -->
+          </div>
+          <div class="role-legend">
+            <span class="legend-dot civilian-color"></span> <span id="leg-civ">Civilian</span>
+            <span class="legend-dot spy-color"></span> <span id="leg-spy">Spy</span>
+            <span class="legend-dot blank-color"></span> <span id="leg-blk">Blank</span>
+          </div>
+        </div>
+
+        <!-- Setting Counters -->
+        <div class="setting-group compact">
           <label id="lbl-total-players">Total Players:</label>
-          <input type="number" id="input-total-players" value="6" min="4" max="10">
+          <div class="counter-control">
+            <button class="counter-btn" id="btn-minus-total">−</button>
+            <span class="counter-val" id="val-total">6</span>
+            <button class="counter-btn" id="btn-plus-total">+</button>
+          </div>
         </div>
-        <div class="setting-group">
+        
+        <div class="setting-group compact">
           <label id="lbl-spy-count">Spies:</label>
-          <input type="number" id="input-spy-count" value="1" min="1" max="3">
+          <div class="counter-control">
+            <button class="counter-btn" id="btn-minus-spy">−</button>
+            <span class="counter-val" id="val-spy">1</span>
+            <button class="counter-btn" id="btn-plus-spy">+</button>
+          </div>
         </div>
-        <div class="setting-group">
+        
+        <div class="setting-group compact">
           <label id="lbl-blank-count">Blank Cards:</label>
-          <input type="number" id="input-blank-count" value="0" min="0" max="1">
+          <div class="counter-control">
+            <button class="counter-btn" id="btn-minus-blank">−</button>
+            <span class="counter-val" id="val-blank">0</span>
+            <button class="counter-btn" id="btn-plus-blank">+</button>
+          </div>
         </div>
+        
         <p id="player-count-warning" class="warning hidden">Invalid player configuration.</p>
         
-        <div class="setting-group">
-          <label id="lbl-word-source">Word Source:</label>
-          <select id="select-word-source">
-            <option value="random" id="opt-random-words">Random Words</option>
-            <option value="custom" id="opt-custom-words">Custom Words</option>
-          </select>
+        <!-- Custom Words Toggle -->
+        <div class="setting-group toggle-group">
+          <label id="lbl-custom-toggle">Use Custom Words</label>
+          <label class="switch">
+            <input type="checkbox" id="toggle-custom-words">
+            <span class="slider round"></span>
+          </label>
         </div>
 
         <div id="custom-word-inputs" class="hidden">
-          <p id="custom-words-prompt" class="small-text">Hand the phone to a non-player to enter the words.</p>
           <input type="text" id="input-custom-civilian" placeholder="Civilian Word">
           <input type="text" id="input-custom-spy" placeholder="Spy Word">
         </div>
@@ -74,10 +112,9 @@
             <canvas id="camera-canvas" class="hidden"></canvas>
             <img id="selfie-preview" class="hidden" alt="Selfie Preview">
           </div>
-          <div class="camera-loader hidden" id="camera-loader"></div>
         </div>
         
-        <p id="photo-taken-prompt" class="hidden small-text prompt-text">Photo taken. Now revealing your word. Do not show others.</p>
+        <p id="do-not-show-others" class="hidden small-text prompt-text danger-text">Do not show others.</p>
         
         <div id="word-reveal-area" class="hidden word-area">
           <h3 id="word-reveal-text" class="word-text highlight-text">Your word is: Apple</h3>
