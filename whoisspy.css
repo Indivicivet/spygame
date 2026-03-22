@@ -470,12 +470,8 @@ video {
 .highlight-text {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary-color);
+  color: var(--text-main);
   margin: 16px 0;
-  padding: 12px;
-  background: rgba(59, 130, 246, 0.1);
-  border-radius: 8px;
-  border: 1px dashed var(--primary-color);
 }
 
 /* Pulse animation for CTA buttons */

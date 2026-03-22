@@ -449,7 +449,7 @@ function switchScreen(screenName) {
     DOM.screens[screenName].classList.remove('hidden');
     
     // Header Logic
-    if (screenName === 'game' || screenName === 'end') {
+    if (screenName === 'game' || screenName === 'end' || screenName === 'setup') {
         DOM.appTitle.classList.add('hidden');
         DOM.btnTopReset.classList.remove('hidden');
     } else {
@@ -713,9 +713,9 @@ function showEndGame(winner) {
     DOM.winnerText.style.webkitBackgroundClip = 'text';
     
     if (winner === 'Civilians') {
-        DOM.endGuessPrompt.innerText = "The spies failed. Spies, can you guess what the civilian's word was?";
         DOM.endSpyWord.classList.remove('hidden');
-        DOM.endSpyWord.innerText = "Spy word: " + state.currentWords.spy;
+        DOM.endSpyWord.innerHTML = `Spy word: <span style="color: var(--accent-color)">${state.currentWords.spy}</span>`;
+        DOM.endGuessPrompt.innerText = "I wonder what the civilian word was...?";
     } else {
         DOM.endGuessPrompt.innerText = "The spies won! Spies, did you successfully deduce the civilian word?";
         DOM.endSpyWord.classList.add('hidden');
