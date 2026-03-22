@@ -23,6 +23,7 @@ const lang_ja = {
     roleBlank: "白紙",
     handToPlayerN: "プレイヤー{n}にスマホを渡す",
     resetGame: "ゲームをリセット",
+    resetConfirmation: "ゲームをリセットしてもよろしいですか？",
     usingExistingPlayers: "既存のメンバーを使用 ({n})",
     thatsMe: "それは私です！",
     civiliansWinPrompt: "市民のお題は何だったのでしょう...？",

@@ -250,7 +250,12 @@ function updateStartButtonState() {
 
 function setupEventListeners() {
     // Top Reset button
-    DOM.btnTopReset.addEventListener('click', resetToHome);
+    DOM.btnTopReset.addEventListener('click', () => {
+        if (state.phase === 'game' || state.phase === 'setup' || state.phase === 'setup-bypass') {
+            if (!confirm(getLoc('resetConfirmation'))) return;
+        }
+        resetToHome();
+    });
     
     // Language selection
     DOM.flags.forEach(flag => {

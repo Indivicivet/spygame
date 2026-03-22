@@ -23,6 +23,7 @@ const lang_zh_TW = {
     roleBlank: "白板",
     handToPlayerN: "請把手機給 {n}號玩家",
     resetGame: "重置遊戲",
+    resetConfirmation: "確定要重置遊戲嗎？",
     usingExistingPlayers: "使用現有玩家 ({n})",
     thatsMe: "是我！",
     civiliansWinPrompt: "平民詞到底是什麼呢...？",

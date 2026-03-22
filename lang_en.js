@@ -23,6 +23,7 @@ const lang_en = {
     roleBlank: "Blank Card",
     handToPlayerN: "Hand the phone to Player {n}",
     resetGame: "Reset Game",
+    resetConfirmation: "Are you sure you want to reset the game?",
     usingExistingPlayers: "Using existing players ({n})",
     thatsMe: "That's me!",
     civiliansWinPrompt: "I wonder what the civilian word was...?",
