@@ -207,8 +207,8 @@ function updateVisualization() {
     
     const colors = [
         { c: 'rb-civ', w: civPct },
-        { c: 'rb-spy', w: spyPct },
-        { c: 'rb-blk', w: blkPct }
+        { c: 'rb-blk', w: blkPct },
+        { c: 'rb-spy', w: spyPct }
     ];
     
     colors.forEach(col => {
@@ -549,10 +549,10 @@ function updateInGameVisualization() {
     const segments = [
         { c: 'rb-civ', w: (counts.civ/total)*100, dead: false },
         { c: 'rb-civ rb-dead', w: (counts.deadCiv/total)*100, dead: true },
-        { c: 'rb-spy', w: (counts.spy/total)*100, dead: false },
-        { c: 'rb-spy rb-dead', w: (counts.deadSpy/total)*100, dead: true },
         { c: 'rb-blk', w: (counts.blk/total)*100, dead: false },
-        { c: 'rb-blk rb-dead', w: (counts.deadBlk/total)*100, dead: true }
+        { c: 'rb-blk rb-dead', w: (counts.deadBlk/total)*100, dead: true },
+        { c: 'rb-spy', w: (counts.spy/total)*100, dead: false },
+        { c: 'rb-spy rb-dead', w: (counts.deadSpy/total)*100, dead: true }
     ];
 
     segments.forEach(seg => {
