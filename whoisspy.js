@@ -350,7 +350,6 @@ function getLoc(key) {
 function applyLanguage(lang) {
     const loc = LOCALIZATION_MAP[lang];
     document.title = loc.title;
-    DOM.appTitle.innerText = loc.title;
     DOM.btnTopReset.innerText = loc.resetGame;
     
     DOM.ui.lblTotal.innerText = loc.totalPlayers;
