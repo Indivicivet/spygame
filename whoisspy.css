@@ -68,6 +68,7 @@ header h1 {
   letter-spacing: -0.5px;
   background: linear-gradient(90deg, #60a5fa, #3b82f6);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: opacity 0.3s;
 }
@@ -254,6 +255,12 @@ input[type="text"]:focus {
   background: rgba(255, 255, 255, 0.25);
 }
 
+.counter-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent !important;
+}
+
 .counter-val {
   width: 40px;
   text-align: center;
@@ -352,6 +359,13 @@ button {
 
 button:active {
   transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: var(--secondary-color) !important;
+  box-shadow: none !important;
 }
 
 .primary-btn {
@@ -642,6 +656,7 @@ video {
   margin-bottom: 8px;
   background: linear-gradient(90deg, #10b981, #3b82f6);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

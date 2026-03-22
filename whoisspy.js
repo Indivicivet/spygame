@@ -219,6 +219,33 @@ function updateVisualization() {
             DOM.ui.vBar.appendChild(div);
         }
     });
+    updateDisabledCounters();
+}
+
+function updateDisabledCounters() {
+    const total = state.config.total;
+    const spies = state.config.spies;
+    const blanks = state.config.blanks;
+    const allowedCombined = maxSpiesBlanks(total);
+
+    document.getElementById('btn-minus-total').disabled = (total <= 4);
+    document.getElementById('btn-plus-total').disabled = (total >= 10);
+    
+    document.getElementById('btn-minus-spy').disabled = (spies <= 1);
+    document.getElementById('btn-plus-spy').disabled = (spies + blanks >= allowedCombined);
+    
+    document.getElementById('btn-minus-blank').disabled = (blanks <= 0);
+    document.getElementById('btn-plus-blank').disabled = (blanks >= 1 || spies + blanks >= allowedCombined);
+}
+
+function updateStartButtonState() {
+    if (state.config.source === 'custom') {
+        const cWord = DOM.ui.customCiv.value.trim();
+        const sWord = DOM.ui.customSpy.value.trim();
+        DOM.ui.btnStart.disabled = (!cWord || !sWord);
+    } else {
+        DOM.ui.btnStart.disabled = false;
+    }
 }
 
 function setupEventListeners() {
@@ -251,9 +278,14 @@ function setupEventListeners() {
 
     // Custom Words Toggle
     DOM.ui.toggleCustom.addEventListener('change', (e) => {
+        state.config.source = e.target.checked ? 'custom' : 'random';
         if (e.target.checked) DOM.ui.customArea.classList.remove('hidden');
         else DOM.ui.customArea.classList.add('hidden');
+        updateStartButtonState();
     });
+
+    DOM.ui.customCiv.addEventListener('input', updateStartButtonState);
+    DOM.ui.customSpy.addEventListener('input', updateStartButtonState);
 
     DOM.ui.btnStart.addEventListener('click', startGame);
     
@@ -357,10 +389,7 @@ function startGame() {
     if (state.config.source === 'custom') {
         state.config.customCivilian = DOM.ui.customCiv.value.trim();
         state.config.customSpy = DOM.ui.customSpy.value.trim();
-        if (!state.config.customCivilian || !state.config.customSpy) {
-            alert("Please enter custom words.");
-            return;
-        }
+        if (!state.config.customCivilian || !state.config.customSpy) return;
         state.currentWords.civilian = state.config.customCivilian;
         state.currentWords.spy = state.config.customSpy;
     } else {
