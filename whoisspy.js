@@ -453,7 +453,7 @@ function switchScreen(screenName) {
     DOM.screens[screenName].classList.remove('hidden');
     
     // Header Logic
-    if (screenName === 'game' || screenName === 'end' || screenName === 'setup') {
+    if (screenName === 'game' || screenName === 'setup') {
         DOM.btnTopReset.classList.remove('hidden');
     } else {
         DOM.btnTopReset.classList.add('hidden');
@@ -709,6 +709,7 @@ function checkWinCondition() {
 function showEndGame(winner) {
     DOM.endModal.classList.remove('hidden');
     DOM.postgameActions.classList.add('hidden');
+    DOM.btnTopReset.classList.add('hidden');
     
     DOM.winnerText.innerText = winner === 'Spies' ? getLoc('spiesWin') : getLoc('civiliansWin');
     DOM.winnerText.style.background = winner === 'Spies' ? 'linear-gradient(90deg, #ef4444, #f59e0b)' : 'linear-gradient(90deg, #10b981, #3b82f6)';
