@@ -267,6 +267,7 @@ input[type="text"]:focus {
   display: inline-block;
   width: 50px;
   height: 28px;
+  flex: none;
 }
 
 .switch input { 
