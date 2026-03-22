@@ -58,8 +58,6 @@ const DOM = {
         game: document.getElementById('main-game-screen')
     },
     flags: document.querySelectorAll('.flag'),
-    mainHeader: document.getElementById('main-header'),
-    appTitle: document.getElementById('app-title'),
     btnTopReset: document.getElementById('btn-top-reset'),
     
     // Home screen
@@ -456,12 +454,8 @@ function switchScreen(screenName) {
     
     // Header Logic
     if (screenName === 'game' || screenName === 'end' || screenName === 'setup') {
-        DOM.mainHeader.classList.add('hidden');
-        DOM.appTitle.classList.add('hidden');
         DOM.btnTopReset.classList.remove('hidden');
     } else {
-        DOM.mainHeader.classList.remove('hidden');
-        DOM.appTitle.classList.remove('hidden');
         DOM.btnTopReset.classList.add('hidden');
     }
 }
