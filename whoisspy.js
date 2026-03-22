@@ -333,7 +333,22 @@ function setupEventListeners() {
         state.phase = 'end';
         DOM.postgameActions.classList.remove('hidden');
         DOM.endgameWordsReveal.classList.remove('hidden');
-        DOM.endgameWordsText.innerHTML = `${getLoc('roleCivilian')}: ${state.currentWords.civilian} <br> ${getLoc('roleSpy')}: ${state.currentWords.spy}`;
+        
+        let civT = state.currentWords.civilianTranslation ? ` <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">(${state.currentWords.civilianTranslation})</span>` : '';
+        let spyT = state.currentWords.spyTranslation ? ` <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">(${state.currentWords.spyTranslation})</span>` : '';
+        
+        DOM.endgameWordsText.innerHTML = `
+            <div style="display: inline-block; text-align: left; background: rgba(255,255,255,0.05); padding: 16px 24px; border-radius: 12px; margin-top: 8px;">
+                <div style="margin-bottom: 12px; font-size: 1.3rem;">
+                    <span style="display: inline-block; min-width: 90px; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">${getLoc('roleCivilian')}</span>
+                    <span style="font-weight: 800; color: var(--accent-color)">${state.currentWords.civilian}</span>${civT}
+                </div>
+                <div style="font-size: 1.3rem;">
+                    <span style="display: inline-block; min-width: 90px; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">${getLoc('roleSpy')}</span>
+                    <span style="font-weight: 800; color: var(--danger-color)">${state.currentWords.spy}</span>${spyT}
+                </div>
+            </div>
+        `;
         renderPlayerGrid();
     });
 
