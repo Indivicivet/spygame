@@ -597,12 +597,13 @@ function renderPlayerGrid() {
             if (p.eliminated) classes += ' striped-dead';
         }
         
+        let skullHtml = p.eliminated ? ' 💀' : '';
         item.innerHTML = `
             ${arrowHtml}
             <div class="player-img-wrapper">
                 <img src="${p.img}" alt="Player ${p.id}">
             </div>
-            <div class="player-number">P${p.id}</div>
+            <div class="player-number">P${p.id}${skullHtml}</div>
             ${roleHtml}
         `;
         if (!p.eliminated && state.phase === 'game') {
