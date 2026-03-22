@@ -509,9 +509,9 @@ video {
   transform: translateY(-2px);
 }
 
-.player-item.bg-civ { background-color: var(--civ-color); border-color: var(--civ-color); color: white; }
-.player-item.bg-spy { background-color: var(--spy-color); border-color: var(--spy-color); color: white; }
-.player-item.bg-blk { background-color: var(--blk-color); border-color: var(--blk-color); color: white; }
+.player-item.bg-civ { background-color: #1d4ed8; border-color: var(--civ-color); color: white; }
+.player-item.bg-spy { background-color: #b91c1c; border-color: var(--spy-color); color: white; }
+.player-item.bg-blk { background-color: #475569; border-color: var(--blk-color); color: white; }
 
 .player-item.striped-dead {
   background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.5) 0, rgba(0,0,0,0.5) 15px, transparent 15px, transparent 30px);
@@ -561,13 +561,11 @@ video {
 }
 
 .player-item.eliminated {
-  opacity: 0.6;
-  filter: grayscale(100%);
+  opacity: 0.7;
   cursor: default;
 }
 .player-item.eliminated:hover {
   transform: none;
-  background: rgba(30, 41, 59, 0.8);
 }
 
 .player-img-wrapper {
@@ -597,7 +595,7 @@ video {
 
 .player-role-label {
   font-size: 0.8rem;
-  color: var(--danger-color);
+  color: rgba(255,255,255,0.9);
   font-weight: 600;
   margin-top: 4px;
 }
