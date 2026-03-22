@@ -1,12 +1,22 @@
 const words_en = [
   { civilian: "Bicycle", spy: "Motorbike" },
-  { civilian: "Apple", spy: "Pear" },
+  { civilian: "Apple", spy: "Orange" },
   { civilian: "Train", spy: "Subway" },
   { civilian: "Library", spy: "Bookstore" },
   { civilian: "Coffee", spy: "Tea" },
-  { civilian: "Pangolin", spy: "Armadillo" },
   { civilian: "Guitar", spy: "Violin" },
   { civilian: "Pizza", spy: "Burger" },
   { civilian: "Piano", spy: "Keyboard" },
-  { civilian: "Shark", spy: "Dolphin" }
+  { civilian: "Shark", spy: "Dolphin" },
+  { civilian: "Dog", spy: "Cat" },
+  { civilian: "Water", spy: "Milk" },
+  { civilian: "Sun", spy: "Moon" },
+  { civilian: "Phone", spy: "Computer" },
+  { civilian: "Summer", spy: "Winter" },
+  { civilian: "Doctor", spy: "Nurse" },
+  { civilian: "Bus", spy: "Taxi" },
+  { civilian: "Lake", spy: "Ocean" },
+  { civilian: "Mountain", spy: "River" },
+  { civilian: "Red", spy: "Blue" },
+  { civilian: "Bread", spy: "Rice" }
 ];

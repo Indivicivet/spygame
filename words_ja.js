@@ -1,12 +1,22 @@
 const words_ja = [
   { civilian: "自転車", spy: "バイク" },
-  { civilian: "りんご", spy: "梨" },
+  { civilian: "りんご", spy: "みかん" },
   { civilian: "電車", spy: "地下鉄" },
   { civilian: "図書館", spy: "本屋" },
   { civilian: "コーヒー", spy: "お茶" },
-  { civilian: "センザンコウ", spy: "アルマジロ" },
   { civilian: "ギター", spy: "バイオリン" },
   { civilian: "ピザ", spy: "ハンバーガー" },
   { civilian: "ピアノ", spy: "キーボード" },
-  { civilian: "サメ", spy: "イルカ" }
+  { civilian: "サメ", spy: "イルカ" },
+  { civilian: "犬", spy: "猫" },
+  { civilian: "水", spy: "牛乳" },
+  { civilian: "太陽", spy: "月" },
+  { civilian: "スマホ", spy: "パソコン" },
+  { civilian: "夏", spy: "冬" },
+  { civilian: "医者", spy: "看護師" },
+  { civilian: "バス", spy: "タクシー" },
+  { civilian: "湖", spy: "海" },
+  { civilian: "山", spy: "川" },
+  { civilian: "赤", spy: "青" },
+  { civilian: "パン", spy: "ご飯" }
 ];

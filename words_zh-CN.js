@@ -1,12 +1,22 @@
 const words_zh_CN = [
   { civilian: "自行车", spy: "摩托车" },
-  { civilian: "苹果", spy: "梨" },
+  { civilian: "苹果", spy: "橘子" },
   { civilian: "火车", spy: "地铁" },
   { civilian: "图书馆", spy: "书店" },
   { civilian: "咖啡", spy: "茶" },
-  { civilian: "穿山甲", spy: "犰狳" },
   { civilian: "吉他", spy: "小提琴" },
   { civilian: "披萨", spy: "汉堡" },
   { civilian: "钢琴", spy: "电子琴" },
-  { civilian: "鲨鱼", spy: "海豚" }
+  { civilian: "鲨鱼", spy: "海豚" },
+  { civilian: "狗", spy: "猫" },
+  { civilian: "水", spy: "牛奶" },
+  { civilian: "太阳", spy: "月亮" },
+  { civilian: "手机", spy: "电脑" },
+  { civilian: "夏天", spy: "冬天" },
+  { civilian: "医生", spy: "护士" },
+  { civilian: "公交车", spy: "出租车" },
+  { civilian: "湖", spy: "海" },
+  { civilian: "山", spy: "河" },
+  { civilian: "红色", spy: "蓝色" },
+  { civilian: "面包", spy: "米饭" }
 ];

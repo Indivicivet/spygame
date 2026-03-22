@@ -1,12 +1,22 @@
 const words_zh_TW = [
   { civilian: "自行車", spy: "摩托車" },
-  { civilian: "蘋果", spy: "梨" },
+  { civilian: "蘋果", spy: "橘子" },
   { civilian: "火車", spy: "捷運" },
   { civilian: "圖書館", spy: "書店" },
   { civilian: "咖啡", spy: "茶" },
-  { civilian: "穿山甲", spy: "犰狳" },
   { civilian: "吉他", spy: "小提琴" },
   { civilian: "披薩", spy: "漢堡" },
   { civilian: "鋼琴", spy: "電子琴" },
-  { civilian: "鯊魚", spy: "海豚" }
+  { civilian: "鯊魚", spy: "海豚" },
+  { civilian: "狗", spy: "貓" },
+  { civilian: "水", spy: "牛奶" },
+  { civilian: "太陽", spy: "月亮" },
+  { civilian: "手機", spy: "電腦" },
+  { civilian: "夏天", spy: "冬天" },
+  { civilian: "醫生", spy: "護士" },
+  { civilian: "公車", spy: "計程車" },
+  { civilian: "湖", spy: "海" },
+  { civilian: "山", spy: "河" },
+  { civilian: "紅色", spy: "藍色" },
+  { civilian: "麵包", spy: "米飯" }
 ];
