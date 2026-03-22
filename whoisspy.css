@@ -578,9 +578,9 @@ video {
   position: relative;
 }
 
-.player-item.eliminated .player-img-wrapper {
-  border-color: var(--danger-color);
-}
+.player-item.bg-civ .player-img-wrapper { border-color: var(--civ-color); }
+.player-item.bg-spy .player-img-wrapper { border-color: var(--spy-color); }
+.player-item.bg-blk .player-img-wrapper { border-color: white; }
 .player-item.eliminated .player-img-wrapper::after {
   content: '';
   position: absolute;
