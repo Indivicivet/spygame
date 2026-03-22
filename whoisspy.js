@@ -574,8 +574,6 @@ function renderPlayerGrid() {
         let classes = 'player-item';
         if (p.eliminated) classes += ' eliminated';
         if (state.selectedPlayerIndex === index && state.phase === 'game') classes += ' selected';
-        const item = document.createElement('div');
-        item.className = classes;
         
         let arrowHtml = '';
         if (!p.eliminated && index === state.turnFocusIndex && state.phase === 'game') {
@@ -596,6 +594,9 @@ function renderPlayerGrid() {
             classes += (p.role === 'civilian') ? ' bg-civ' : (p.role === 'spy' ? ' bg-spy' : ' bg-blk');
             if (p.eliminated) classes += ' striped-dead';
         }
+        
+        const item = document.createElement('div');
+        item.className = classes;
         
         let skullHtml = p.eliminated ? ' 💀' : '';
         item.innerHTML = `
