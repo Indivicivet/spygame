@@ -351,6 +351,7 @@ function applyLanguage(lang) {
     const loc = LOCALIZATION_MAP[lang];
     document.title = loc.title;
     DOM.btnTopReset.innerText = loc.resetGame;
+    DOM.btnEndSeeResults.innerText = loc.seeResults;
     
     DOM.ui.lblTotal.innerText = loc.totalPlayers;
     DOM.ui.lblSpy.innerText = loc.spyCount;

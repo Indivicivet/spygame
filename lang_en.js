@@ -28,5 +28,6 @@ const lang_en = {
     thatsMe: "That's me!",
     civiliansWinPrompt: "I wonder what the civilian word was...?",
     spiesWinPrompt: "The spies won! Spies, did you successfully deduce the civilian word?",
-    spyWordLabel: "Spy word: "
+    spyWordLabel: "Spy word: ",
+    seeResults: "See Results"
 };

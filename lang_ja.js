@@ -28,5 +28,6 @@ const lang_ja = {
     thatsMe: "それは私です！",
     civiliansWinPrompt: "市民のお題は何だったのでしょう...？",
     spiesWinPrompt: "スパイの勝利！スパイの皆さん、市民のお題を推理できましたか？",
-    spyWordLabel: "スパイのお題： "
+    spyWordLabel: "スパイのお題： ",
+    seeResults: "結果を見る"
 };
