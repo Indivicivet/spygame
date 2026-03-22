@@ -714,10 +714,10 @@ function showEndGame(winner) {
     
     if (winner === 'Civilians') {
         DOM.endSpyWord.classList.remove('hidden');
-        DOM.endSpyWord.innerHTML = `Spy word: <span style="color: var(--accent-color)">${state.currentWords.spy}</span>`;
-        DOM.endGuessPrompt.innerText = "I wonder what the civilian word was...?";
+        DOM.endSpyWord.innerHTML = `${getLoc('spyWordLabel')}<span style="color: var(--accent-color)">${state.currentWords.spy}</span>`;
+        DOM.endGuessPrompt.innerText = getLoc('civiliansWinPrompt');
     } else {
-        DOM.endGuessPrompt.innerText = "The spies won! Spies, did you successfully deduce the civilian word?";
+        DOM.endGuessPrompt.innerText = getLoc('spiesWinPrompt');
         DOM.endSpyWord.classList.add('hidden');
     }
     
@@ -736,7 +736,7 @@ function updateHomeUI() {
     if (state.isRestarting) {
         DOM.ui.configCounters.classList.add('hidden');
         DOM.ui.existingPlayersGroup.classList.remove('hidden');
-        DOM.ui.lblExisting.innerText = "Using existing players (" + state.players.length + ")";
+        DOM.ui.lblExisting.innerText = getLoc('usingExistingPlayers').replace('{n}', state.players.length);
         DOM.ui.vBar.parentElement.classList.add('hidden');
     } else {
         DOM.ui.configCounters.classList.remove('hidden');
@@ -776,7 +776,7 @@ function doRestartWithNewRoles() {
 function prepareReSetupNextPlayer() {
     const p = state.players[state.setupIndex];
     DOM.setupTitle.innerText = getLoc('handToPlayerN').replace('{n}', p.id);
-    DOM.btnSelfie.innerText = "That's me!";
+    DOM.btnSelfie.innerText = getLoc('thatsMe');
 
     DOM.setupTitle.classList.remove('hidden');
     DOM.video.classList.add('hidden');
