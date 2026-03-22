@@ -24,11 +24,8 @@
 <body>
   <div id="app">
     <!-- Top Bar: Logo/Title and Language Selector -->
-    <header id="main-header">
-      <div id="header-left">
+    <header id="main-header" style="justify-content: center;">
         <h1 id="app-title">Who is Spy?</h1>
-        <button id="btn-top-reset" class="secondary-btn hidden small-btn">Reset</button>
-      </div>
     </header>
 
     <!-- Home Screen: Setup -->
@@ -179,6 +176,9 @@
         <button id="btn-end-see-results" class="primary-btn action-btn">See Results</button>
       </div>
     </div>
+    
+    <!-- Floating Reset Button -->
+    <button id="btn-top-reset" class="secondary-btn hidden small-btn" style="position: fixed; bottom: 20px; right: 20px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">Reset</button>
   </div>
   
   <script src="whoisspy.js"></script>
