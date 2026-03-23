@@ -29,5 +29,6 @@ const lang_zh_CN = {
     civiliansWinPrompt: "平民词到底是什么呢...？",
     spiesWinPrompt: "卧底胜利！卧底，你们猜出平民词了吗？",
     spyWordLabel: "卧底词： ",
-    seeResults: "查看结果"
+    seeResults: "查看结果",
+    showTranslation: "🇬🇧 英文翻译"
 };

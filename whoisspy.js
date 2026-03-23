@@ -91,6 +91,8 @@ const DOM = {
     wordRevealArea: document.getElementById('word-reveal-area'),
     wordRevealText: document.getElementById('word-reveal-text'),
     doNotShowOthers: document.getElementById('do-not-show-others'),
+    btnShowTranslation: document.getElementById('btn-show-translation'),
+    translationText: document.getElementById('translation-text'),
     
     // Main Game Screen
     ingameVBar: document.getElementById('ingame-role-visualization'),
@@ -101,6 +103,8 @@ const DOM = {
     ingameRevealOverlay: document.getElementById('ingame-reveal-overlay'),
     ingameWordText: document.getElementById('ingame-forgot-word-text'),
     btnIngameRemember: document.getElementById('btn-ingame-remember'),
+    btnIngameShowTranslation: document.getElementById('btn-ingame-show-translation'),
+    ingameTranslationText: document.getElementById('ingame-translation-text'),
     
     postgameActions: document.getElementById('postgame-actions'),
     endgameWordsReveal: document.getElementById('endgame-words-reveal'),
@@ -256,6 +260,20 @@ function setupEventListeners() {
         resetToHome();
     });
     
+    // Translation Buttons
+    if(DOM.btnShowTranslation) {
+        DOM.btnShowTranslation.addEventListener('click', () => {
+             DOM.btnShowTranslation.classList.add('hidden');
+             DOM.translationText.classList.remove('hidden');
+        });
+    }
+    if(DOM.btnIngameShowTranslation) {
+        DOM.btnIngameShowTranslation.addEventListener('click', () => {
+             DOM.btnIngameShowTranslation.classList.add('hidden');
+             DOM.ingameTranslationText.classList.remove('hidden');
+        });
+    }
+
     // Language selection
     DOM.flags.forEach(flag => {
         flag.addEventListener('click', () => {
@@ -315,7 +333,20 @@ function setupEventListeners() {
         if (state.selectedPlayerIndex === null) return;
         DOM.ingameActions.classList.add('hidden');
         DOM.ingameRevealOverlay.classList.remove('hidden');
-        DOM.ingameWordText.innerHTML = getPlayerWordRevealString(state.players[state.selectedPlayerIndex].role);
+        
+        let popRole = state.players[state.selectedPlayerIndex].role;
+        DOM.ingameWordText.innerHTML = getPlayerWordRevealString(popRole);
+        
+        let trans = getTranslationOnly(popRole);
+        if (state.lang !== 'en' && trans && state.config.source !== 'custom') {
+            DOM.btnIngameShowTranslation.classList.remove('hidden');
+            DOM.ingameTranslationText.classList.add('hidden');
+            DOM.ingameTranslationText.innerText = trans;
+        } else {
+            DOM.btnIngameShowTranslation.classList.add('hidden');
+            DOM.ingameTranslationText.classList.add('hidden');
+        }
+        
         DOM.playerGrid.classList.add('hidden'); // hide grid to prevent cheating
     });
 
@@ -367,6 +398,8 @@ function applyLanguage(lang) {
     document.title = loc.title;
     DOM.btnTopReset.innerText = loc.resetGame;
     DOM.btnEndSeeResults.innerText = loc.seeResults;
+    if(DOM.btnShowTranslation) DOM.btnShowTranslation.innerText = loc.showTranslation;
+    if(DOM.btnIngameShowTranslation) DOM.btnIngameShowTranslation.innerText = loc.showTranslation;
     
     DOM.ui.lblTotal.innerText = loc.totalPlayers;
     DOM.ui.lblSpy.innerText = loc.spyCount;
@@ -416,6 +449,8 @@ function startGame() {
         const pair = wordList[Math.floor(Math.random() * wordList.length)];
         state.currentWords.civilian = pair.civilian;
         state.currentWords.spy = pair.spy;
+        state.currentWords.civilianTranslation = pair.civilianTranslation;
+        state.currentWords.spyTranslation = pair.spyTranslation;
     }
     
     DOM.postgameActions.classList.add('hidden');
@@ -523,6 +558,12 @@ function getPlayerWordRevealString(role) {
     return `<span class="small-text">${getLoc('blankWordPrompt')}</span>`;
 }
 
+function getTranslationOnly(role) {
+    if (role === 'civilian') return state.currentWords.civilianTranslation || '';
+    if (role === 'spy') return state.currentWords.spyTranslation || '';
+    return '';
+}
+
 function takeSelfie() {
     if (state.stream) {
         DOM.canvas.width = DOM.video.videoWidth;
@@ -549,7 +590,18 @@ function takeSelfie() {
     DOM.wordRevealArea.classList.remove('hidden');
     DOM.btnRemember.classList.remove('hidden');
     
-    DOM.wordRevealText.innerHTML = getPlayerWordRevealString(state.players[state.setupIndex].role);
+    let popRole2 = state.players[state.setupIndex].role;
+    DOM.wordRevealText.innerHTML = getPlayerWordRevealString(popRole2);
+    
+    let trans2 = getTranslationOnly(popRole2);
+    if (state.lang !== 'en' && trans2 && state.config.source !== 'custom') {
+        DOM.btnShowTranslation.classList.remove('hidden');
+        DOM.translationText.classList.add('hidden');
+        DOM.translationText.innerText = trans2;
+    } else {
+        DOM.btnShowTranslation.classList.add('hidden');
+        DOM.translationText.classList.add('hidden');
+    }
 }
 
 function nextSetupPlayer() {
@@ -815,7 +867,18 @@ function viewWordBypassSelfie() {
     DOM.wordRevealArea.classList.remove('hidden');
     DOM.btnRemember.classList.remove('hidden');
     
-    DOM.wordRevealText.innerHTML = getPlayerWordRevealString(state.players[state.setupIndex].role);
+    let popRole3 = state.players[state.setupIndex].role;
+    DOM.wordRevealText.innerHTML = getPlayerWordRevealString(popRole3);
+    
+    let trans3 = getTranslationOnly(popRole3);
+    if (state.lang !== 'en' && trans3 && state.config.source !== 'custom') {
+        DOM.btnShowTranslation.classList.remove('hidden');
+        DOM.translationText.classList.add('hidden');
+        DOM.translationText.innerText = trans3;
+    } else {
+        DOM.btnShowTranslation.classList.add('hidden');
+        DOM.translationText.classList.add('hidden');
+    }
 }
 
 function nextReSetupPlayer() {

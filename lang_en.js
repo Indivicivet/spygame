@@ -29,5 +29,6 @@ const lang_en = {
     civiliansWinPrompt: "I wonder what the civilian word was...?",
     spiesWinPrompt: "The spies won! Spies, did you successfully deduce the civilian word?",
     spyWordLabel: "Spy word: ",
-    seeResults: "See Results"
+    seeResults: "See Results",
+    showTranslation: "🇬🇧 English Translation"
 };

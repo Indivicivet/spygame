@@ -29,5 +29,6 @@ const lang_zh_TW = {
     civiliansWinPrompt: "平民詞到底是什麼呢...？",
     spiesWinPrompt: "臥底勝利！臥底，你們猜出平民詞了嗎？",
     spyWordLabel: "臥底詞： ",
-    seeResults: "查看結果"
+    seeResults: "查看結果",
+    showTranslation: "🇬🇧 英文翻譯"
 };
