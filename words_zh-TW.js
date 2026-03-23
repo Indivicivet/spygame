@@ -66,7 +66,7 @@ const words_zh_TW = [
   { civilian: "電視", spy: "螢幕", civilianTranslation: "Television", spyTranslation: "Monitor" },
   { civilian: "筆記型電腦", spy: "平板電腦", civilianTranslation: "Laptop", spyTranslation: "Tablet" },
   { civilian: "智慧型手機", spy: "電話", civilianTranslation: "Smartphone", spyTranslation: "Telephone" },
-  { civilian: "收音機", spy: "喇叭", civilianTranslation: "Radio", spyTranslation: "Speaker" },
+  { civilian: "耳機", spy: "麥克風", civilianTranslation: "Earphones", spyTranslation: "Microphone" },
   { civilian: "窗戶", spy: "門", civilianTranslation: "Window", spyTranslation: "Door" },
   { civilian: "屋頂", spy: "天花板", civilianTranslation: "Roof", spyTranslation: "Ceiling" },
   { civilian: "大衣", spy: "夾克", civilianTranslation: "Coat", spyTranslation: "Jacket" },
