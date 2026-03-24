@@ -420,9 +420,9 @@ button:disabled {
 .camera-wrapper {
   position: relative;
   width: 100%;
-  max-width: 280px;
+  max-width: 340px;
   aspect-ratio: 1;
-  margin: 20px auto;
+  margin: 10px auto;
 }
 
 .camera-container, .modal-img-frame {
@@ -472,6 +472,11 @@ video {
   font-weight: 800;
   color: var(--text-main);
   margin: 16px 0;
+}
+
+.word-text {
+  font-size: 2.2rem;
+  margin: 8px 0;
 }
 
 /* Pulse animation for CTA buttons */
@@ -542,15 +547,15 @@ video {
 }
 
 .turn-indicator.dir-right {
-  right: 8px;
+  right: 16px;
 }
 
 .turn-indicator.dir-left {
-  left: 8px;
+  left: 16px;
 }
 
 .turn-indicator-text {
-  font-size: 0.55rem;
+  font-size: 0.70rem;
   font-weight: 800;
   color: var(--accent-color);
   text-transform: uppercase;
@@ -561,14 +566,14 @@ video {
 .turn-arrow {
   background-color: var(--accent-color);
   color: white;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
