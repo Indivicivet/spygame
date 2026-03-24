@@ -31,5 +31,7 @@ const lang_en = {
     spyWordLabel: "Spy word: ",
     seeResults: "See Results",
     showTranslation: "🇬🇧 English Translation",
-    showPronunciation: "🗣️ Show Pronunciation"
+    showPronunciation: "🗣️ Show Pronunciation",
+    roundText: "ROUND",
+    startText: "START"
 };

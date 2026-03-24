@@ -31,5 +31,7 @@ const lang_zh_TW = {
     spyWordLabel: "臥底詞： ",
     seeResults: "查看結果",
     showTranslation: "🇬🇧 英文翻譯",
-    showPronunciation: "🗣️ 顯示發音"
+    showPronunciation: "🗣️ 顯示發音",
+    roundText: "回合",
+    startText: "開始"
 };

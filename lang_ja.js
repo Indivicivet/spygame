@@ -31,5 +31,7 @@ const lang_ja = {
     spyWordLabel: "スパイのお題： ",
     seeResults: "結果を見る",
     showTranslation: "🇬🇧 英語の翻訳",
-    showPronunciation: "🗣️ 発音を表示"
+    showPronunciation: "🗣️ 発音を表示",
+    roundText: "ラウンド",
+    startText: "開始"
 };

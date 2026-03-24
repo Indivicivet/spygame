@@ -31,5 +31,7 @@ const lang_zh_CN = {
     spyWordLabel: "卧底词： ",
     seeResults: "查看结果",
     showTranslation: "🇬🇧 英语翻译",
-    showPronunciation: "🗣️ 显示发音"
+    showPronunciation: "🗣️ 显示发音",
+    roundText: "回合",
+    startText: "开始"
 };

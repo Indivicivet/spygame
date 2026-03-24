@@ -725,9 +725,9 @@ function renderPlayerGrid() {
             const arrowChar = state.playDirection === 1 ? '→' : '←';
             arrowHtml = `
             <div class="turn-indicator ${dirClass}">
-                <div class="turn-indicator-text">ROUND</div>
+                <div class="turn-indicator-text">${getLoc('roundText')}</div>
                 <div class="turn-arrow">${arrowChar}</div>
-                <div class="turn-indicator-text">START</div>
+                <div class="turn-indicator-text">${getLoc('startText')}</div>
             </div>`;
         }
         
