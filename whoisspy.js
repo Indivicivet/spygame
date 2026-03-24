@@ -208,21 +208,17 @@ function updateVisualization() {
     
     if (civ < 0) civ = 0;
     
-    let civPct = (civ / total) * 100;
-    let spyPct = (spy / total) * 100;
-    let blkPct = (blk / total) * 100;
-    
-    const colors = [
-        { c: 'rb-civ', w: civPct },
-        { c: 'rb-blk', w: blkPct },
-        { c: 'rb-spy', w: spyPct }
+    const counts = [
+        { c: 'rb-civ', count: civ },
+        { c: 'rb-blk', count: blk },
+        { c: 'rb-spy', count: spy }
     ];
     
-    colors.forEach(col => {
-        if (col.w > 0) {
+    counts.forEach(col => {
+        for (let i = 0; i < col.count; i++) {
             let div = document.createElement('div');
             div.className = col.c;
-            div.style.width = col.w + '%';
+            div.style.flex = "1";
             DOM.ui.vBar.appendChild(div);
         }
     });
@@ -689,21 +685,20 @@ function updateInGameVisualization() {
         }
     });
 
-    const total = state.players.length;
     const segments = [
-        { c: 'rb-civ', w: (counts.civ/total)*100, dead: false },
-        { c: 'rb-civ rb-dead', w: (counts.deadCiv/total)*100, dead: true },
-        { c: 'rb-blk', w: (counts.blk/total)*100, dead: false },
-        { c: 'rb-blk rb-dead', w: (counts.deadBlk/total)*100, dead: true },
-        { c: 'rb-spy', w: (counts.spy/total)*100, dead: false },
-        { c: 'rb-spy rb-dead', w: (counts.deadSpy/total)*100, dead: true }
+        { c: 'rb-civ', count: counts.civ, dead: false },
+        { c: 'rb-civ rb-dead', count: counts.deadCiv, dead: true },
+        { c: 'rb-blk', count: counts.blk, dead: false },
+        { c: 'rb-blk rb-dead', count: counts.deadBlk, dead: true },
+        { c: 'rb-spy', count: counts.spy, dead: false },
+        { c: 'rb-spy rb-dead', count: counts.deadSpy, dead: true }
     ];
 
     segments.forEach(seg => {
-        if (seg.w > 0) {
+        for (let i = 0; i < seg.count; i++) {
             let div = document.createElement('div');
             div.className = seg.c;
-            div.style.width = seg.w + '%';
+            div.style.flex = "1";
             if (seg.dead) {
                 div.innerHTML = '💀';
             }

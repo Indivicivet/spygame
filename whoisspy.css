@@ -110,6 +110,7 @@ header h1 {
   border-radius: 6px;
   overflow: hidden;
   display: flex;
+  gap: 2px;
   margin-bottom: 12px;
 }
 .rb-civ { background-color: var(--civ-color); transition: width 0.3s ease; }
