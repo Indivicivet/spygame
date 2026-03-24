@@ -30,5 +30,6 @@ const lang_zh_CN = {
     spiesWinPrompt: "卧底胜利！卧底，你们猜出平民词了吗？",
     spyWordLabel: "卧底词： ",
     seeResults: "查看结果",
-    showTranslation: "🇬🇧 英文翻译"
+    showTranslation: "🇬🇧 英语翻译",
+    showPronunciation: "🗣️ 显示发音"
 };

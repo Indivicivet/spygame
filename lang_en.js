@@ -30,5 +30,6 @@ const lang_en = {
     spiesWinPrompt: "The spies won! Spies, did you successfully deduce the civilian word?",
     spyWordLabel: "Spy word: ",
     seeResults: "See Results",
-    showTranslation: "🇬🇧 English Translation"
+    showTranslation: "🇬🇧 English Translation",
+    showPronunciation: "🗣️ Show Pronunciation"
 };

@@ -30,5 +30,6 @@ const lang_zh_TW = {
     spiesWinPrompt: "臥底勝利！臥底，你們猜出平民詞了嗎？",
     spyWordLabel: "臥底詞： ",
     seeResults: "查看結果",
-    showTranslation: "🇬🇧 英文翻譯"
+    showTranslation: "🇬🇧 英文翻譯",
+    showPronunciation: "🗣️ 顯示發音"
 };

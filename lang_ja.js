@@ -30,5 +30,6 @@ const lang_ja = {
     spiesWinPrompt: "スパイの勝利！スパイの皆さん、市民のお題を推理できましたか？",
     spyWordLabel: "スパイのお題： ",
     seeResults: "結果を見る",
-    showTranslation: "🇬🇧 英語の翻訳"
+    showTranslation: "🇬🇧 英語の翻訳",
+    showPronunciation: "🗣️ 発音を表示"
 };

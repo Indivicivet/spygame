@@ -93,6 +93,8 @@ const DOM = {
     doNotShowOthers: document.getElementById('do-not-show-others'),
     btnShowTranslation: document.getElementById('btn-show-translation'),
     translationText: document.getElementById('translation-text'),
+    btnShowPronunciation: document.getElementById('btn-show-pronunciation'),
+    pronunciationText: document.getElementById('pronunciation-text'),
     
     // Main Game Screen
     ingameVBar: document.getElementById('ingame-role-visualization'),
@@ -105,6 +107,8 @@ const DOM = {
     btnIngameRemember: document.getElementById('btn-ingame-remember'),
     btnIngameShowTranslation: document.getElementById('btn-ingame-show-translation'),
     ingameTranslationText: document.getElementById('ingame-translation-text'),
+    btnIngameShowPronunciation: document.getElementById('btn-ingame-show-pronunciation'),
+    ingamePronunciationText: document.getElementById('ingame-pronunciation-text'),
     
     postgameActions: document.getElementById('postgame-actions'),
     endgameWordsReveal: document.getElementById('endgame-words-reveal'),
@@ -267,10 +271,22 @@ function setupEventListeners() {
              DOM.translationText.classList.remove('hidden');
         });
     }
+    if(DOM.btnShowPronunciation) {
+        DOM.btnShowPronunciation.addEventListener('click', () => {
+             DOM.btnShowPronunciation.classList.add('hidden');
+             DOM.pronunciationText.classList.remove('hidden');
+        });
+    }
     if(DOM.btnIngameShowTranslation) {
         DOM.btnIngameShowTranslation.addEventListener('click', () => {
              DOM.btnIngameShowTranslation.classList.add('hidden');
              DOM.ingameTranslationText.classList.remove('hidden');
+        });
+    }
+    if(DOM.btnIngameShowPronunciation) {
+        DOM.btnIngameShowPronunciation.addEventListener('click', () => {
+             DOM.btnIngameShowPronunciation.classList.add('hidden');
+             DOM.ingamePronunciationText.classList.remove('hidden');
         });
     }
 
@@ -346,6 +362,16 @@ function setupEventListeners() {
             DOM.btnIngameShowTranslation.classList.add('hidden');
             DOM.ingameTranslationText.classList.add('hidden');
         }
+
+        let pron = getPronunciationOnly(popRole);
+        if (state.lang !== 'en' && pron && state.config.source !== 'custom') {
+            DOM.btnIngameShowPronunciation.classList.remove('hidden');
+            DOM.ingamePronunciationText.classList.add('hidden');
+            DOM.ingamePronunciationText.innerText = pron;
+        } else {
+            DOM.btnIngameShowPronunciation.classList.add('hidden');
+            DOM.ingamePronunciationText.classList.add('hidden');
+        }
         
         DOM.playerGrid.classList.add('hidden'); // hide grid to prevent cheating
     });
@@ -400,6 +426,8 @@ function applyLanguage(lang) {
     DOM.btnEndSeeResults.innerText = loc.seeResults;
     if(DOM.btnShowTranslation) DOM.btnShowTranslation.innerText = loc.showTranslation;
     if(DOM.btnIngameShowTranslation) DOM.btnIngameShowTranslation.innerText = loc.showTranslation;
+    if(DOM.btnShowPronunciation) DOM.btnShowPronunciation.innerText = loc.showPronunciation;
+    if(DOM.btnIngameShowPronunciation) DOM.btnIngameShowPronunciation.innerText = loc.showPronunciation;
     
     DOM.ui.lblTotal.innerText = loc.totalPlayers;
     DOM.ui.lblSpy.innerText = loc.spyCount;
@@ -451,6 +479,8 @@ function startGame() {
         state.currentWords.spy = pair.spy;
         state.currentWords.civilianTranslation = pair.civilianTranslation;
         state.currentWords.spyTranslation = pair.spyTranslation;
+        state.currentWords.civilianPronunciation = pair.civilianPronunciation;
+        state.currentWords.spyPronunciation = pair.spyPronunciation;
     }
     
     DOM.postgameActions.classList.add('hidden');
@@ -564,6 +594,12 @@ function getTranslationOnly(role) {
     return '';
 }
 
+function getPronunciationOnly(role) {
+    if (role === 'civilian') return state.currentWords.civilianPronunciation || '';
+    if (role === 'spy') return state.currentWords.spyPronunciation || '';
+    return '';
+}
+
 function takeSelfie() {
     if (state.stream) {
         DOM.canvas.width = DOM.video.videoWidth;
@@ -601,6 +637,16 @@ function takeSelfie() {
     } else {
         DOM.btnShowTranslation.classList.add('hidden');
         DOM.translationText.classList.add('hidden');
+    }
+
+    let pron2 = getPronunciationOnly(popRole2);
+    if (state.lang !== 'en' && pron2 && state.config.source !== 'custom') {
+        DOM.btnShowPronunciation.classList.remove('hidden');
+        DOM.pronunciationText.classList.add('hidden');
+        DOM.pronunciationText.innerText = pron2;
+    } else {
+        DOM.btnShowPronunciation.classList.add('hidden');
+        DOM.pronunciationText.classList.add('hidden');
     }
 }
 
@@ -878,6 +924,16 @@ function viewWordBypassSelfie() {
     } else {
         DOM.btnShowTranslation.classList.add('hidden');
         DOM.translationText.classList.add('hidden');
+    }
+
+    let pron3 = getPronunciationOnly(popRole3);
+    if (state.lang !== 'en' && pron3 && state.config.source !== 'custom') {
+        DOM.btnShowPronunciation.classList.remove('hidden');
+        DOM.pronunciationText.classList.add('hidden');
+        DOM.pronunciationText.innerText = pron3;
+    } else {
+        DOM.btnShowPronunciation.classList.add('hidden');
+        DOM.pronunciationText.classList.add('hidden');
     }
 }
 
