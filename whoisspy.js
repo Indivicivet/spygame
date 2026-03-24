@@ -471,12 +471,15 @@ function startGame() {
     } else {
         const wordList = WORDS_MAP[state.lang];
         const pair = wordList[Math.floor(Math.random() * wordList.length)];
-        state.currentWords.civilian = pair.civilian;
-        state.currentWords.spy = pair.spy;
-        state.currentWords.civilianTranslation = pair.civilianTranslation;
-        state.currentWords.spyTranslation = pair.spyTranslation;
-        state.currentWords.civilianPronunciation = pair.civilianPronunciation;
-        state.currentWords.spyPronunciation = pair.spyPronunciation;
+        const flip = Math.random() < 0.5;
+        const cKey = flip ? 'a' : 'b';
+        const sKey = flip ? 'b' : 'a';
+        state.currentWords.civilian = pair[cKey];
+        state.currentWords.spy = pair[sKey];
+        state.currentWords.civilianTranslation = pair[cKey + 'Translation'] || '';
+        state.currentWords.spyTranslation = pair[sKey + 'Translation'] || '';
+        state.currentWords.civilianPronunciation = pair[cKey + 'Pronunciation'] || '';
+        state.currentWords.spyPronunciation = pair[sKey + 'Pronunciation'] || '';
     }
     
     DOM.postgameActions.classList.add('hidden');
